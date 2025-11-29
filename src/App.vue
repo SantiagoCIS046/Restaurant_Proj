@@ -1,38 +1,29 @@
 <script setup>
-import { ref } from "vue";
+import { ref, computed } from "vue";
+import { useRouter, useRoute } from "vue-router";
 import NavBar from "./components/NavBar.vue";
-import Restaurant from "./components/Restaurant.vue";
-import Registro from "./components/Registro.vue";
-import Menu from "./components/Menu.vue";
-import Clientes from "./components/Clientes.vue";
-import Reportes from "./components/Reportes.vue";
-import Inventario from "./components/Inventario.vue";
-import Personal from "./components/Personal.vue";
-import Pedidos from "./components/Pedidos.vue";
-import Finanzas from "./components/Finanzas.vue";
-import Caracteristicas from "./components/Caracteristicas.vue";
 
-const currentView = ref("gestion");
+// Composables de Vue Router
+const router = useRouter();
+const route = useRoute();
+
+// Estado para sub-vistas (si es necesario mantener esta funcionalidad)
 const subView = ref("mesas");
 
-const components = {
-  gestion: Restaurant,
-  registro: Registro,
-  menu: Menu,
-  clientes: Clientes,
-  reportes: Reportes,
-  inventario: Inventario,
-  personal: Personal,
-  pedidos: Pedidos,
-  finanzas: Finanzas,
-  caracteristicas: Caracteristicas,
-};
+// Computed para obtener la vista actual desde la ruta
+const currentView = computed(() => {
+  const routeName = route.name;
+  if (routeName === "Gestion") return "gestion";
+  return routeName ? routeName.toLowerCase() : "gestion";
+});
 
+// Función para navegar entre secciones principales
 const handleNavigate = (section) => {
-  currentView.value = section;
+  router.push(`/${section}`);
   subView.value = "mesas"; // Reset sub-view on main navigation
 };
 
+// Función para navegar entre sub-secciones
 const handleSubNavigate = (subSection) => {
   subView.value = subSection;
 };
@@ -44,7 +35,8 @@ const handleSubNavigate = (subSection) => {
     @navigate="handleNavigate"
     @sub-navigate="handleSubNavigate"
   />
-  <component :is="components[currentView]" :sub-view="subView" />
+  <!-- RouterView renderiza el componente correspondiente a la ruta actual -->
+  <router-view :sub-view="subView" />
 </template>
 
 <style scoped></style>
