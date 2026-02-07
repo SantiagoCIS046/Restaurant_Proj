@@ -1,9 +1,12 @@
 // Importación de Vue Router
 import { createRouter, createWebHistory } from "vue-router";
+import { useAuth } from "../composables/useAuth";
 
 // Importación de componentes
+import Login from "../components/Login.vue";
 import Restaurant from "../components/Restaurant.vue";
 import Registro from "../components/Registro.vue";
+import Usuarios from "../components/Usuarios.vue"; // New Component
 import Menu from "../components/Menu.vue";
 import Clientes from "../components/Clientes.vue";
 import Reportes from "../components/Reportes.vue";
@@ -15,6 +18,16 @@ import Caracteristicas from "../components/Caracteristicas.vue";
 
 // Definición de rutas de la aplicación
 const routes = [
+  {
+    path: "/login",
+    name: "Login",
+    component: Login,
+    meta: {
+      title: "Iniciar Sesión",
+      description: "Ingreso al sistema",
+      public: true
+    }
+  },
   {
     path: "/",
     redirect: "/gestion", // Redirección a la página principal
@@ -133,13 +146,23 @@ const router = createRouter({
 
 // Guard de navegación global - Se ejecuta antes de cada cambio de ruta
 router.beforeEach((to, from, next) => {
+  const { isAuthenticated } = useAuth();
+
   // Actualizar el título de la página según la ruta
   if (to.meta.title) {
     document.title = `${to.meta.title} - Restaurant App`;
   } else {
     document.title = "Restaurant App";
   }
-  next();
+
+  // Verificación de autenticación
+  if (!to.meta.public && !isAuthenticated.value) {
+    next('/login');
+  } else if (to.path === '/login' && isAuthenticated.value) {
+    next('/gestion');
+  } else {
+    next();
+  }
 });
 
 // Exportación del router

@@ -17,6 +17,10 @@ const currentView = computed(() => {
   return routeName ? routeName.toLowerCase() : "gestion";
 });
 
+const isLoginPage = computed(() => {
+  return route.name === 'Login';
+});
+
 // Función para navegar entre secciones principales
 const handleNavigate = (section) => {
   router.push(`/${section}`);
@@ -31,6 +35,7 @@ const handleSubNavigate = (subSection) => {
 
 <template>
   <NavBar
+    v-if="!isLoginPage"
     :current-view="currentView"
     @navigate="handleNavigate"
     @sub-navigate="handleSubNavigate"

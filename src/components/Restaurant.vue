@@ -74,6 +74,7 @@
             <div
               v-for="mesa in filteredMesas"
               :key="mesa.id"
+              v-memo="[mesa.estado, mesa.capacidad, mesa.ubicacion]"
               class="table-card"
               :class="mesa.estado"
             >
@@ -84,7 +85,7 @@
               <div class="table-info">Ubicación: {{ mesa.ubicacion }}</div>
               <select
                 v-model="mesa.estado"
-                @change="guardarMesas"
+                @change="guardarMesasDebounced"
                 class="status-select"
               >
                 <option value="disponible">Disponible</option>
@@ -321,6 +322,7 @@
           <div
             v-for="mesa in mesasDisponibles"
             :key="mesa.id"
+            v-memo="[mesa.id, mesa.capacidad, mesa.ubicacion]"
             class="available-table-card"
             @click="abrirReserva(mesa)"
           >
@@ -372,6 +374,7 @@
               <div
                 v-for="mesa in getTablesByLocation(location)"
                 :key="mesa.id"
+                v-memo="[mesa.estado, mesa.capacidad]"
                 class="location-table-card"
                 :class="mesa.estado"
               >
@@ -419,6 +422,7 @@
           <div
             v-for="res in reservasActivas"
             :key="res.id"
+            v-memo="[res.id, res.estado, res.nombre, res.mesaId]"
             class="reservation-card"
           >
             <div class="reservation-header">
@@ -472,7 +476,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from "vue";
+import { ref, computed, onMounted } from "vue";
 
 const props = defineProps({
   subView: {
@@ -484,6 +488,9 @@ const props = defineProps({
 // === Estado ===
 const mesas = ref([]);
 const reservas = ref([]);
+
+// Debounce timer for saving
+let saveTimeout = null;
 
 const mesaSeleccionada = ref(null);
 const showAddModal = ref(false);
@@ -555,6 +562,16 @@ function obtenerMesas() {
 
 function guardarMesas() {
   localStorage.setItem("mesasRestaurante", JSON.stringify(mesas.value));
+}
+
+// Debounced version for frequent updates (like status changes)
+function guardarMesasDebounced() {
+  if (saveTimeout) {
+    clearTimeout(saveTimeout);
+  }
+  saveTimeout = setTimeout(() => {
+    guardarMesas();
+  }, 300); // Wait 300ms after last change
 }
 
 function obtenerReservas() {
@@ -766,8 +783,24 @@ const reservasActivas = computed(() =>
   reservas.value.filter((r) => r.estado === "activa")
 );
 
+// Optimized: Use computed for stats to avoid recalculation
+const estadisticas = computed(() => {
+  const stats = {
+    disponible: 0,
+    reservada: 0,
+    ocupada: 0,
+    deshabilitada: 0,
+  };
+  mesas.value.forEach((mesa) => {
+    if (stats[mesa.estado] !== undefined) {
+      stats[mesa.estado]++;
+    }
+  });
+  return stats;
+});
+
 function countByState(estado) {
-  return mesas.value.filter((m) => m.estado === estado).length;
+  return estadisticas.value[estado] || 0;
 }
 
 function getTableById(id) {
@@ -806,8 +839,8 @@ onMounted(() => {
   reservas.value = obtenerReservas();
 });
 
-watch(mesas, guardarMesas, { deep: true });
-watch(reservas, guardarReservas, { deep: true });
+// Removed deep watchers that cause performance issues
+// Now saving is done manually in each function that modifies data
 </script>
 
 <style scoped>
@@ -883,5 +916,286 @@ watch(reservas, guardarReservas, { deep: true });
   border-color: #3182ce;
   box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
   background-color: #ffffff;
+}
+
+/* ========== RESPONSIVE DESIGN ========== */
+
+/* Tablet and below */
+@media (max-width: 1024px) {
+  .container {
+    padding-top: 100px;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .mesas-layout {
+    gap: 1.5rem;
+  }
+
+  .locations-sidebar {
+    width: 200px;
+  }
+
+  .header-buttons {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .add-table-btn,
+  .reserve-table-btn,
+  .view-reservations-btn {
+    font-size: 0.9rem;
+    padding: 0.65rem 1rem;
+  }
+}
+
+/* Mobile landscape and tablet portrait */
+@media (max-width: 768px) {
+  .container {
+    padding-top: 90px;
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+
+  .mesas-layout {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .locations-sidebar {
+    width: 100%;
+    padding: 0.75rem;
+  }
+
+  .location-btn {
+    padding: 0.6rem;
+    font-size: 0.9rem;
+  }
+
+  .header-container {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .header-container h1 {
+    font-size: 1.5rem;
+  }
+
+  .header-buttons {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .stats {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+
+  .stat-item {
+    padding: 0.75rem;
+  }
+
+  .stat-number {
+    font-size: 1.75rem;
+  }
+
+  .stat-label {
+    font-size: 0.85rem;
+  }
+
+  .table-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+  }
+
+  .modal-content {
+    width: 95%;
+    max-width: 500px;
+    padding: 1.5rem;
+    margin: 1rem;
+  }
+
+  .large-modal {
+    max-width: 95%;
+  }
+
+  .form-row {
+    flex-direction: column;
+  }
+
+  .form-group {
+    margin-bottom: 1rem;
+  }
+}
+
+/* Mobile portrait */
+@media (max-width: 600px) {
+  .container {
+    padding-top: 80px;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+
+  .header-container h1 {
+    font-size: 1.25rem;
+  }
+
+  .header-buttons {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .add-table-btn,
+  .reserve-table-btn,
+  .view-reservations-btn {
+    width: 100%;
+    justify-content: center;
+    font-size: 0.85rem;
+    padding: 0.75rem;
+  }
+
+  .reservations-badge {
+    position: static;
+    margin-left: 0.5rem;
+  }
+
+  .stats {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+  }
+
+  .stat-item {
+    padding: 0.5rem;
+  }
+
+  .stat-number {
+    font-size: 1.5rem;
+  }
+
+  .stat-label {
+    font-size: 0.75rem;
+  }
+
+  .table-grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .table-card {
+    padding: 1rem;
+  }
+
+  .table-id {
+    font-size: 1rem;
+  }
+
+  .table-info {
+    font-size: 0.85rem;
+  }
+
+  .status-select {
+    font-size: 0.85rem;
+    padding: 0.5rem;
+  }
+
+  .delete-btn,
+  .reserve-btn {
+    font-size: 0.85rem;
+    padding: 0.5rem;
+  }
+
+  .modal-content {
+    width: 95%;
+    padding: 1rem;
+    margin: 0.5rem;
+    border-radius: 12px;
+  }
+
+  .modal-content h2 {
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+  }
+
+  .close {
+    font-size: 1.75rem;
+    top: 0.5rem;
+    right: 0.75rem;
+  }
+
+  .form-group label {
+    font-size: 0.85rem;
+  }
+
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    font-size: 0.9rem;
+    padding: 0.65rem;
+  }
+
+  .modal-actions button {
+    font-size: 0.9rem;
+    padding: 0.65rem 1.25rem;
+  }
+
+  .available-table-card,
+  .location-table-card,
+  .reservation-card {
+    padding: 0.75rem;
+  }
+
+  .available-table-id,
+  .location-table-id {
+    font-size: 0.95rem;
+  }
+
+  .available-table-info-item,
+  .location-table-info-item,
+  .info-item {
+    font-size: 0.85rem;
+  }
+
+  .select-table-btn {
+    font-size: 0.85rem;
+    padding: 0.5rem;
+  }
+
+  .delete-reservation-btn {
+    font-size: 0.85rem;
+    padding: 0.5rem 1rem;
+  }
+}
+
+/* Extra small devices */
+@media (max-width: 360px) {
+  .container {
+    padding-top: 75px;
+    padding-left: 0.25rem;
+    padding-right: 0.25rem;
+  }
+
+  .header-container h1 {
+    font-size: 1.1rem;
+  }
+
+  .stats {
+    grid-template-columns: 1fr;
+  }
+
+  .add-table-btn,
+  .reserve-table-btn,
+  .view-reservations-btn {
+    font-size: 0.8rem;
+    padding: 0.65rem;
+  }
+
+  .modal-content {
+    padding: 0.75rem;
+  }
+
+  .modal-content h2 {
+    font-size: 1.1rem;
+  }
 }
 </style>
