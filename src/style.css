@@ -37,6 +37,35 @@ body {
   /* Reduced base font size */
 }
 
+/* Global Container Responsive Padding */
+.container {
+  padding-top: 100px;
+}
+
+@media (max-width: 1024px) {
+  .container {
+    padding-top: 90px;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding-top: 85px;
+  }
+}
+
+@media (max-width: 600px) {
+  .container {
+    padding-top: 75px;
+  }
+}
+
+@media (max-width: 360px) {
+  .container {
+    padding-top: 70px;
+  }
+}
+
 h1 {
   font-size: 1.75rem;
   /* Reduced from 2.5rem */

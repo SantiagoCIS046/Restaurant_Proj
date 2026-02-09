@@ -14,7 +14,7 @@
             class="view-reservations-btn"
             @click="showReservationsModal = true"
           >
-             <i class="fas fa-list"></i> Reservas
+            <i class="fas fa-list"></i> Reservas
             <span class="reservations-badge" id="reservations-badge">{{
               reservasActivas.length
             }}</span>
@@ -82,8 +82,11 @@
                 <div class="table-id">{{ mesa.id.toUpperCase() }}</div>
               </div>
               <div class="table-info">
-                  <span><i class="fas fa-users"></i> {{ mesa.capacidad }}</span>
-                  <span><i class="fas fa-map-marker-alt"></i> {{ mesa.ubicacion }}</span>
+                <span><i class="fas fa-users"></i> {{ mesa.capacidad }}</span>
+                <span
+                  ><i class="fas fa-map-marker-alt"></i>
+                  {{ mesa.ubicacion }}</span
+                >
               </div>
               <select
                 v-model="mesa.estado"
@@ -95,18 +98,25 @@
                 <option value="ocupada">Ocupada</option>
                 <option value="deshabilitada">Deshabilitada</option>
               </select>
-              <div class="card-actions" style="display: flex; gap: 0.5rem; margin-top: auto;">
-                  <button class="delete-btn" style="flex: 1;" @click="eliminarMesa(mesa.id)">
-                    <i class="fas fa-trash"></i>
-                  </button>
-                  <button
-                    v-if="mesa.estado === 'disponible'"
-                    class="reserve-btn"
-                    style="flex: 1;"
-                    @click="abrirReserva(mesa)"
-                  >
-                    <i class="fas fa-calendar-plus"></i>
-                  </button>
+              <div
+                class="card-actions"
+                style="display: flex; gap: 0.5rem; margin-top: auto"
+              >
+                <button
+                  class="delete-btn"
+                  style="flex: 1"
+                  @click="eliminarMesa(mesa.id)"
+                >
+                  <i class="fas fa-trash"></i>
+                </button>
+                <button
+                  v-if="mesa.estado === 'disponible'"
+                  class="reserve-btn"
+                  style="flex: 1"
+                  @click="abrirReserva(mesa)"
+                >
+                  <i class="fas fa-calendar-plus"></i>
+                </button>
               </div>
             </div>
           </div>
@@ -852,7 +862,7 @@ onMounted(() => {
 @import "../style.css";
 
 .container {
-  padding-top: 120px; /* Adjust to account for fixed navbar and sub-nav */
+  padding-top: 100px; /* Adjust to account for fixed navbar and sub-nav */
 }
 
 .mesas-layout {
@@ -928,7 +938,7 @@ onMounted(() => {
 /* Tablet and below */
 @media (max-width: 1024px) {
   .container {
-    padding-top: 100px;
+    padding-top: 90px;
     padding-left: 1rem;
     padding-right: 1rem;
   }
@@ -957,7 +967,7 @@ onMounted(() => {
 /* Mobile landscape and tablet portrait */
 @media (max-width: 768px) {
   .container {
-    padding-top: 90px;
+    padding-top: 85px;
     padding-left: 0.75rem;
     padding-right: 0.75rem;
   }
@@ -1037,7 +1047,7 @@ onMounted(() => {
 /* Mobile portrait */
 @media (max-width: 600px) {
   .container {
-    padding-top: 80px;
+    padding-top: 75px;
     padding-left: 0.5rem;
     padding-right: 0.5rem;
   }
@@ -1175,7 +1185,7 @@ onMounted(() => {
 /* Extra small devices */
 @media (max-width: 360px) {
   .container {
-    padding-top: 75px;
+    padding-top: 70px;
     padding-left: 0.25rem;
     padding-right: 0.25rem;
   }
