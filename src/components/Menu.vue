@@ -1024,17 +1024,18 @@ const updatePriceItem = () => {
   color: #2d3748;
 }
 
+
 .category-list {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 0.5rem; /* Reduced gap */
 }
 
 .category-btn {
   background: #edf2f7;
   border: 1px solid #cbd5e0;
   color: #4a5568;
-  padding: 0.3rem 0.5rem;
+  padding: 0.25rem 0.5rem; /* Reduced padding */
   cursor: pointer;
   border-radius: 4px;
   text-align: left;
@@ -1043,21 +1044,14 @@ const updatePriceItem = () => {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  font-size: 0.9rem; /* Reduced font size */
 }
 
-.category-btn:hover {
-  background: #e2e8f0;
-}
-
-.category-btn.active {
-  background: #3182ce;
-  color: white;
-  border-color: #2c5282;
-}
+/* ... states ... */
 
 .right-side {
   flex: 1;
-  padding: 1rem;
+  padding: 0.75rem; /* Reduced padding */
   background: #ffffff;
   overflow-y: hidden;
   border: 1px solid #e2e8f0;
@@ -1068,114 +1062,37 @@ const updatePriceItem = () => {
   background: #38a169;
   border: none;
   color: white;
-  padding: 0.5rem 1rem;
+  padding: 0.4rem 0.8rem; /* Reduced padding */
   font-size: 0.8rem;
   cursor: pointer;
   border-radius: 4px;
-  margin-bottom: 1rem;
+  margin-bottom: 0.75rem;
   transition: background 0.2s ease;
 }
 
-.add-btn:hover {
-  background: #2f855a;
-}
-
-.add-form {
-  margin-bottom: 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.add-form select,
-.add-form input {
-  padding: 0.5rem;
-  border: 1px solid #cbd5e0;
-  border-radius: 4px;
-}
-
-.add-form button {
-  padding: 0.5rem;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background 0.2s ease;
-}
-
-.add-form button:first-of-type {
-  background: #3182ce;
-  color: white;
-}
-
-.add-form button:first-of-type:hover {
-  background: #2c5282;
-}
-
-.add-form button:last-of-type {
-  background: #e53e3e;
-  color: white;
-}
-
-.add-form button:last-of-type:hover {
-  background: #c53030;
-}
-
-.item-list h2 {
-  margin-bottom: 0.5rem;
-  color: #2d3748;
-}
-
-.item-list ul {
-  list-style: none;
-  padding: 0;
-}
-
-.item-list li {
-  padding: 0.25rem 0;
-  border-bottom: 1px solid #e2e8f0;
-}
+/* ... form styles ... */
 
 .item-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.5rem 0;
-}
-
-.item-name {
-  flex: 1;
+  padding: 0.35rem 0; /* Reduced padding */
+  font-size: 0.9rem; /* Reduced font size */
 }
 
 .item-actions {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.35rem; /* Reduced gap */
 }
 
-.edit-btn {
-  background: #3182ce;
-  border: none;
-  color: white;
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background 0.2s ease;
+.edit-btn, .delete-btn, .view-btn {
+    padding: 0.2rem 0.4rem; /* Smaller action buttons */
+    font-size: 0.75rem;
 }
 
-.edit-btn:hover {
-  background: #2c5282;
-}
+/* ... rest of styles ... */
 
-.delete-btn {
-  background: #ce3131;
-  height: 28px;
-  border: none;
-  color: white;
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background 0.2s ease;
-}
 
 .delete-btn:hover {
   background: #c53030;
@@ -1394,5 +1311,90 @@ const updatePriceItem = () => {
   border: 1px solid #cbd5e0;
   border-radius: 4px;
   box-sizing: border-box;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .productos-page {
+    flex-direction: column;
+    position: relative; /* Change from fixed to relative to allow better scrolling on mobile */
+    top: 0;
+    height: auto;
+    overflow: visible;
+    padding-bottom: 2rem;
+  }
+
+  .left-side {
+    flex: none;
+    width: 100%;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    border-right: none;
+    border: 1px solid #e2e8f0;
+    padding: 0.75rem;
+    max-height: 200px; /* Limit height of categories */
+  }
+
+  .category-list {
+    flex-direction: row; /* Horizontal scroll for categories */
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+  }
+
+  .category-btn {
+    min-width: 120px;
+    text-align: center;
+  }
+  
+  .right-side {
+      height: auto;
+      overflow: visible;
+  }
+
+  .button-bar {
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      justify-content: center;
+  }
+  
+  .button-bar button {
+      flex: 1 1 auto;
+      font-size: 0.8rem;
+      padding: 0.5rem;
+  }
+  
+  .item-row {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.5rem;
+      background: #f8fafc;
+      padding: 0.75rem;
+      border-radius: 6px;
+      margin-bottom: 0.5rem;
+  }
+  
+  .item-actions {
+      width: 100%;
+      justify-content: flex-end;
+      border-top: 1px solid #edf2f7;
+      padding-top: 0.5rem;
+      margin-top: 0.25rem;
+  }
+  
+  .price-item-row {
+      flex-direction: column;
+      align-items: flex-start;
+  }
+  
+  .price-item-price {
+      margin: 0.5rem 0;
+  }
+  
+  .price-item-actions {
+      width: 100%;
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.5rem;
+  }
 }
 </style>

@@ -123,6 +123,16 @@ const routes = [
     },
   },
   {
+    path: "/usuarios", // Add path if not exists or find existing
+    name: "Usuarios",
+    component: Usuarios,
+    meta: {
+      title: "Gestión de Usuarios",
+      description: "Administración de usuarios del sistema",
+      requiresAdmin: true
+    }
+  },
+  {
     // Ruta 404 - Página no encontrada
     path: "/:pathMatch(.*)*",
     name: "NotFound",
@@ -145,8 +155,9 @@ const router = createRouter({
 });
 
 // Guard de navegación global - Se ejecuta antes de cada cambio de ruta
+// Guard de navegación global - Se ejecuta antes de cada cambio de ruta
 router.beforeEach((to, from, next) => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isAdmin } = useAuth(); // Destructure isAdmin as well
 
   // Actualizar el título de la página según la ruta
   if (to.meta.title) {
@@ -155,8 +166,15 @@ router.beforeEach((to, from, next) => {
     document.title = "Restaurant App";
   }
 
-  // Verificación de autenticación
-  if (!to.meta.public && !isAuthenticated.value) {
+  // Verificación de autenticación y roles
+  if (to.meta.requiresAdmin && !isAdmin.value) {
+    // If route requires admin and user is not admin, redirect to management or login
+    if (isAuthenticated.value) {
+      next('/gestion');
+    } else {
+      next('/login');
+    }
+  } else if (!to.meta.public && !isAuthenticated.value) {
     next('/login');
   } else if (to.path === '/login' && isAuthenticated.value) {
     next('/gestion');

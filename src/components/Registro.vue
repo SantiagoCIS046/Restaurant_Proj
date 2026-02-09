@@ -1398,24 +1398,67 @@ onMounted(() => {
   .filter-section {
     flex-direction: column;
     gap: 15px;
+    align-items: stretch; /* Full width filters */
+  }
+
+  .date-filter {
+      flex-direction: column;
+      align-items: flex-start;
+  }
+  
+  .date-input {
+      width: 100%;
+      box-sizing: border-box;
   }
 
   .hero-title {
-    font-size: 2rem;
+    font-size: 1.75rem; /* Slightly smaller for better fit */
   }
 
   .summary-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); /* Allow 2 columns on mobile if space permits */
+    gap: 10px;
+  }
+  
+  .summary-card {
+      padding: 15px; /* Reduce padding */
   }
 
   .table-container {
-    padding: 10px;
+    padding: 0;
+    box-shadow: none; /* Remove shadow on mobile for flatter look */
+    border: 1px solid #e2e8f0;
   }
 
   .registro-table th,
   .registro-table td {
-    padding: 8px 10px;
-    font-size: 0.8rem;
+    padding: 10px;
+    white-space: nowrap; /* Prevent wrapping in cells, allow scroll */
   }
+  
+  .view-toggle {
+      width: 100%;
+      justify-content: space-between;
+  }
+  
+  .view-btn {
+      flex: 1;
+      text-align: center;
+  }
+  
+  .btn-export, .btn-close-small {
+      width: 100%; /* Full width buttons in modals */
+  }
+  
+  .modal-content {
+      padding: 1.5rem;
+      width: 95%;
+  }
+}
+
+@media (max-width: 480px) {
+    .summary-grid {
+        grid-template-columns: 1fr; /* Stack on very small screens */
+    }
 }
 </style>

@@ -5,16 +5,16 @@
         <h1>Gestión de Mesas</h1>
         <div class="header-buttons">
           <button class="add-table-btn" @click="showAddModal = true">
-            ➕ Agregar Mesa
+            <i class="fas fa-plus"></i> Agregar
           </button>
           <button class="reserve-table-btn" @click="showSelectModal = true">
-            📅 Reservar Mesa
+            <i class="fas fa-calendar-check"></i> Reservar
           </button>
           <button
             class="view-reservations-btn"
             @click="showReservationsModal = true"
           >
-            📋 Ver Reservas
+             <i class="fas fa-list"></i> Reservas
             <span class="reservations-badge" id="reservations-badge">{{
               reservasActivas.length
             }}</span>
@@ -30,7 +30,7 @@
             :class="{ active: selectedLocation === 'all' }"
             @click="selectedLocation = 'all'"
           >
-            Todas las Ubicaciones
+            Todas
           </button>
           <button
             v-for="location in ubicaciones"
@@ -81,8 +81,10 @@
               <div class="table-header">
                 <div class="table-id">{{ mesa.id.toUpperCase() }}</div>
               </div>
-              <div class="table-info">Capacidad: {{ mesa.capacidad }}</div>
-              <div class="table-info">Ubicación: {{ mesa.ubicacion }}</div>
+              <div class="table-info">
+                  <span><i class="fas fa-users"></i> {{ mesa.capacidad }}</span>
+                  <span><i class="fas fa-map-marker-alt"></i> {{ mesa.ubicacion }}</span>
+              </div>
               <select
                 v-model="mesa.estado"
                 @change="guardarMesasDebounced"
@@ -93,16 +95,19 @@
                 <option value="ocupada">Ocupada</option>
                 <option value="deshabilitada">Deshabilitada</option>
               </select>
-              <button class="delete-btn" @click="eliminarMesa(mesa.id)">
-                🗑️ Eliminar
-              </button>
-              <button
-                v-if="mesa.estado === 'disponible'"
-                class="reserve-btn"
-                @click="abrirReserva(mesa)"
-              >
-                📅 Reservar
-              </button>
+              <div class="card-actions" style="display: flex; gap: 0.5rem; margin-top: auto;">
+                  <button class="delete-btn" style="flex: 1;" @click="eliminarMesa(mesa.id)">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                  <button
+                    v-if="mesa.estado === 'disponible'"
+                    class="reserve-btn"
+                    style="flex: 1;"
+                    @click="abrirReserva(mesa)"
+                  >
+                    <i class="fas fa-calendar-plus"></i>
+                  </button>
+              </div>
             </div>
           </div>
         </div>
