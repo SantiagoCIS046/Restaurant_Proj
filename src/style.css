@@ -3,11 +3,19 @@
     "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
     sans-serif;
   line-height: 1.5;
-  /* Reduced line height */
   font-weight: 400;
 
-  color: #1a202c;
-  background-color: #f7fafc;
+  /* Light Theme Variables */
+  --bg-body: #f7fafc;
+  --bg-card: #ffffff;
+  --bg-input: #f7fafc;
+  --text-primary: #1a202c;
+  --text-secondary: #718096;
+  --border-color: #e2e8f0;
+  --primary-color: #3182ce;
+  --primary-hover: #2b6cb0;
+  --shadow-color: rgba(0, 0, 0, 0.05);
+  --bg-hover: #edf2f7;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -15,26 +23,40 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+[data-theme='dark'] {
+  /* Dark Theme Variables */
+  --bg-body: #1a202c;
+  --bg-card: #2d3748;
+  --bg-input: #4a5568;
+  --text-primary: #f7fafc;
+  --text-secondary: #a0aec0;
+  --border-color: #4a5568;
+  --primary-color: #63b3ed;
+  --primary-hover: #4299e1;
+  --shadow-color: rgba(0, 0, 0, 0.2);
+  --bg-hover: #4a5568;
+}
+
 a {
   font-weight: 500;
-  color: #3182ce;
+  color: var(--primary-color);
   text-decoration: none;
   transition: color 0.2s ease;
 }
 
 a:hover {
-  color: #2c5282;
+  color: var(--primary-hover);
 }
 
 body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
-  color: #1a202c;
+  background: var(--bg-body);
+  color: var(--text-primary);
   overflow-x: hidden;
   font-size: 14px;
-  /* Reduced base font size */
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* Global Container Responsive Padding */
@@ -71,7 +93,7 @@ h1 {
   /* Reduced from 2.5rem */
   line-height: 1.2;
   font-weight: 700;
-  color: #1a202c;
+  color: var(--text-primary);
   margin: 0;
   letter-spacing: -0.025em;
 }
@@ -96,8 +118,8 @@ button {
   /* Smaller font */
   font-weight: 600;
   font-family: inherit;
-  background-color: #edf2f7;
-  color: #4a5568;
+  background-color: var(--bg-input);
+  color: var(--text-secondary);
   cursor: pointer;
   transition: all 0.2s ease;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
@@ -107,7 +129,7 @@ button {
 }
 
 button:hover {
-  background-color: #e2e8f0;
+  background-color: var(--bg-hover);
   transform: translateY(-1px);
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
@@ -121,10 +143,10 @@ button:focus-visible {
 .card {
   padding: 1.25rem;
   /* Reduced from 2rem */
-  background: white;
+  background: var(--bg-card);
   border-radius: 10px;
   /* Reduced radius */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 4px var(--shadow-color);
 }
 
 #app {
@@ -146,7 +168,7 @@ button:focus-visible {
   /* Reduced padding */
   font-family: inherit;
   background: transparent;
-  color: #1a202c;
+  color: var(--text-primary);
   width: 100%;
   box-sizing: border-box;
 }
@@ -159,7 +181,7 @@ button:focus-visible {
   /* Reduced margin */
   padding-bottom: 0.75rem;
   /* Reduced padding */
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--border-color);
   /* Thinner border */
   flex-wrap: wrap;
   gap: 0.75rem;
@@ -167,7 +189,7 @@ button:focus-visible {
 }
 
 .header-container h1 {
-  color: #1a202c;
+  color: var(--text-primary);
   margin: 0;
   font-size: 1.75rem;
   font-weight: 700;
@@ -270,20 +292,20 @@ button:focus-visible {
 }
 
 .stat-item {
-  background: white;
+  background: var(--bg-card);
   padding: 0.75rem;
   /* Reduced padding */
   border-radius: 8px;
   text-align: center;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border-color);
   transition: all 0.3s ease;
 }
 
 .stat-item:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
-  border-color: #cbd5e0;
+  border-color: var(--border-color);
 }
 
 .stat-number {
@@ -298,7 +320,7 @@ button:focus-visible {
 .stat-label {
   font-size: 0.7rem;
   /* Reduced size */
-  color: #718096;
+  color: var(--text-secondary);
   text-transform: capitalize;
   font-weight: 600;
 }
@@ -313,7 +335,7 @@ button:focus-visible {
 }
 
 .table-card {
-  background: white;
+  background: var(--bg-card);
   border-radius: 8px;
   /* Reduced radius */
   padding: 0.75rem;
@@ -388,7 +410,7 @@ button:focus-visible {
   font-size: 1rem;
   /* Reduced size */
   font-weight: 700;
-  color: #1a202c;
+  color: var(--text-primary);
   margin-bottom: 0;
 }
 
@@ -407,9 +429,9 @@ button:focus-visible {
   padding: 0.3rem;
   /* Reduced padding */
   border-radius: 4px;
-  border: 1px solid #e2e8f0;
-  background-color: white;
-  color: #1a202c;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-card);
+  color: var(--text-primary);
   font-size: 0.75rem;
   margin-bottom: 0.5rem;
   transition: all 0.2s ease;
@@ -418,12 +440,12 @@ button:focus-visible {
 
 .status-select:focus {
   outline: none;
-  border-color: #3182ce;
+  border-color: var(--primary-color);
   box-shadow: 0 0 0 2px rgba(49, 130, 206, 0.1);
 }
 
 .status-select:hover {
-  border-color: #cbd5e0;
+  border-color: var(--border-color);
 }
 
 .delete-btn,
@@ -496,7 +518,7 @@ button:focus-visible {
 }
 
 .modal-content {
-  background: white;
+  background: var(--bg-card);
   border-radius: 16px;
   padding: 2rem;
   max-width: 500px;
@@ -504,7 +526,7 @@ button:focus-visible {
   max-height: 85vh;
   overflow-y: auto;
   box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border-color);
   animation: modalSlideIn 0.3s ease-out;
   box-sizing: border-box;
 }
@@ -531,7 +553,7 @@ button:focus-visible {
   right: 1rem;
   font-size: 1.5rem;
   font-weight: 700;
-  color: #a0aec0;
+  color: var(--text-secondary);
   cursor: pointer;
   transition: all 0.2s ease;
   width: 2rem;
@@ -540,19 +562,19 @@ button:focus-visible {
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  background: #f7fafc;
-  border: 1px solid #e2e8f0;
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
   line-height: 1;
 }
 
 .close:hover {
-  color: #1a202c;
-  background: #edf2f7;
+  color: var(--text-primary);
+  background: var(--bg-input);
   transform: scale(1.1);
 }
 
 .modal-content h2 {
-  color: #1a202c;
+  color: var(--text-primary);
   margin-bottom: 1.5rem;
   text-align: center;
   font-size: 1.5rem;
@@ -578,9 +600,9 @@ button:focus-visible {
   /* Consolidated width */
   padding: 0.875rem;
   border-radius: 10px;
-  border: 2px solid #e2e8f0;
-  background-color: #f7fafc;
-  color: #1a202c;
+  border: 2px solid var(--border-color);
+  background-color: var(--bg-input);
+  color: var(--text-primary);
   font-size: 1rem;
   transition: all 0.2s ease;
   box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
@@ -604,8 +626,8 @@ button:focus-visible {
 .form-group select:focus,
 .form-group textarea:focus {
   outline: none;
-  border-color: #3182ce;
-  background-color: white;
+  border-color: var(--primary-color);
+  background-color: var(--bg-card);
   box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1),
     inset 0 1px 2px rgba(0, 0, 0, 0.05);
 }
@@ -636,14 +658,14 @@ button:focus-visible {
 }
 
 .form-actions button:first-child {
-  background: #f7fafc;
-  color: #4a5568;
-  border: 2px solid #e2e8f0;
+  background: var(--bg-input);
+  color: var(--text-secondary);
+  border: 2px solid var(--border-color);
 }
 
 .form-actions button:first-child:hover {
-  background: #edf2f7;
-  border-color: #cbd5e0;
+  background: var(--bg-hover);
+  border-color: var(--border-color);
 }
 
 .form-actions button:last-child {
@@ -657,7 +679,7 @@ button:focus-visible {
 
 /* Locations Styles */
 .locations-sidebar {
-  background: white;
+  background: var(--bg-card);
   padding: 1.5rem;
   border-radius: 12px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
@@ -678,13 +700,13 @@ button:focus-visible {
   background: transparent;
   border: 1px solid transparent;
   border-radius: 8px;
-  color: #4a5568;
+  color: var(--text-secondary);
   transition: all 0.2s;
 }
 
 .location-btn:hover {
-  background: #f7fafc;
-  color: #2d3748;
+  background: var(--bg-hover);
+  color: var(--text-primary);
 }
 
 .location-btn.active {
@@ -751,7 +773,7 @@ button:focus-visible {
     width: auto;
     margin-bottom: 0;
     flex: 0 0 auto;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--border-color);
   }
 
   .form-row {

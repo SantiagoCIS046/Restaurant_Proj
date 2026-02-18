@@ -9,7 +9,7 @@ import Registro from "../components/Registro.vue";
 import Usuarios from "../components/Usuarios.vue"; // New Component
 import Menu from "../components/Menu.vue";
 import Clientes from "../components/Clientes.vue";
-import Reportes from "../components/Reportes.vue";
+
 import Inventario from "../components/Inventario.vue";
 import Personal from "../components/Personal.vue";
 import Pedidos from "../components/Pedidos.vue";
@@ -68,15 +68,7 @@ const routes = [
       description: "Gestión de clientes del restaurant",
     },
   },
-  {
-    path: "/reportes",
-    name: "Reportes",
-    component: Reportes,
-    meta: {
-      title: "Reportes",
-      description: "Reportes y estadísticas del restaurant",
-    },
-  },
+
   {
     path: "/inventario",
     name: "Inventario",
@@ -114,12 +106,12 @@ const routes = [
     },
   },
   {
-    path: "/caracteristicas",
-    name: "Caracteristicas",
+    path: "/configuracion",
+    name: "Configuracion",
     component: Caracteristicas,
     meta: {
-      title: "Características",
-      description: "Características y configuración del sistema",
+      title: "Configuración",
+      description: "Configuración y características del sistema",
     },
   },
   {

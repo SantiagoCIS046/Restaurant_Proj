@@ -34,11 +34,15 @@
           <h2>{{ selectedCategory }}</h2>
           <ul>
             <li
-              v-for="(item, index) in items[selectedCategory]"
-              :key="item.name"
+              v-for="(item, index) in filteredItems"
+              :key="index"
               class="item-row"
+              :class="{ 'low-stock': settings.notifications.lowStock && item.quantity < 5 }"
             >
-              <span class="item-name">{{ index + 1 }}. {{ item.name }}</span>
+              <div class="item-info">
+                <span class="item-name">{{ item.name }}</span>
+                <span class="item-quantity"> ({{ item.quantity }})</span>
+              </div>
               <div class="item-actions">
                 <button
                   @click="editItem(index)"
@@ -496,6 +500,9 @@
 
 <script setup>
 import { ref, computed } from "vue";
+import { useSettings } from "../composables/useSettings";
+
+const { settings } = useSettings();
 
 // === Estado ===
 const currentSection = ref("productos");
@@ -964,7 +971,7 @@ const updatePriceItem = () => {
   gap: 1rem;
   margin-bottom: 1rem;
   padding: 0.5rem;
-  background: rgba(26, 46, 82, 0.733);
+  background: var(--bg-card);
   border-radius: 1px;
   position: fixed;
   top: 48px; /* Adjust based on navbar height */
@@ -1012,8 +1019,8 @@ const updatePriceItem = () => {
 .left-side {
   flex: 0 0 30%;
   padding: 1rem;
-  background: #dedede7b;
-  border-right: 1px solid #e2e8f0;
+  background: var(--bg-input);
+  border-right: 1px solid var(--border-color);
   border-radius: 10px 0 0 10px;
   overflow-y: auto;
 }
@@ -1021,7 +1028,7 @@ const updatePriceItem = () => {
 .title {
   font-size: 1.5rem;
   margin-bottom: 1rem;
-  color: #2d3748;
+  color: var(--text-primary);
 }
 
 
@@ -1032,9 +1039,9 @@ const updatePriceItem = () => {
 }
 
 .category-btn {
-  background: #edf2f7;
-  border: 1px solid #cbd5e0;
-  color: #4a5568;
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
   padding: 0.25rem 0.5rem; /* Reduced padding */
   cursor: pointer;
   border-radius: 4px;
@@ -1052,9 +1059,9 @@ const updatePriceItem = () => {
 .right-side {
   flex: 1;
   padding: 0.75rem; /* Reduced padding */
-  background: #ffffff;
+  background: var(--bg-card);
   overflow-y: hidden;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border-color);
   border-radius: 8px;
 }
 
@@ -1071,6 +1078,11 @@ const updatePriceItem = () => {
 }
 
 /* ... form styles ... */
+
+.item-row.low-stock {
+  border-left: 4px solid #e53e3e;
+  background-color: var(--bg-hover);
+}
 
 .item-row {
   display: flex;
@@ -1113,7 +1125,7 @@ const updatePriceItem = () => {
 }
 
 .modal-content {
-  background: white;
+  background: var(--bg-card);
   padding: 1.5rem;
   border-radius: 8px;
   width: 300px;
@@ -1124,14 +1136,14 @@ const updatePriceItem = () => {
 .modal-content h3 {
   margin-top: 0;
   margin-bottom: 1rem;
-  color: #2d3748;
+  color: var(--text-primary);
 }
 
 .modal-content select,
 .modal-content input {
   width: 100%;
   padding: 0.5rem;
-  border: 1px solid #cbd5e0;
+  border: 1px solid var(--border-color);
   border-radius: 4px;
   margin-bottom: 1rem;
   box-sizing: border-box;
@@ -1171,7 +1183,7 @@ const updatePriceItem = () => {
 
 .item-quantity {
   font-weight: bold;
-  color: #2d3748;
+  color: var(--text-primary);
 }
 
 .search-bar {
@@ -1181,7 +1193,7 @@ const updatePriceItem = () => {
 .search-input {
   width: 100%;
   padding: 0.5rem;
-  border: 1px solid #cbd5e0;
+  border: 1px solid var(--border-color);
   border-radius: 4px;
   box-sizing: border-box;
 }
@@ -1212,7 +1224,7 @@ const updatePriceItem = () => {
 .search-input-top {
   width: 200px;
   padding: 0.5rem;
-  border: 1px solid #cbd5e0;
+  border: 1px solid var(--border-color);
   border-radius: 4px;
   box-sizing: border-box;
 }
@@ -1227,13 +1239,13 @@ const updatePriceItem = () => {
 .quantity-table td {
   padding: 0.5rem;
   text-align: left;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .quantity-table th {
-  background: #f7fafc;
+  background: var(--bg-input);
   font-weight: bold;
-  color: #2d3748;
+  color: var(--text-primary);
 }
 
 .price-item-row {
@@ -1247,7 +1259,7 @@ const updatePriceItem = () => {
 }
 
 .price-item-row:hover {
-  background: #f7fafc;
+  background: var(--bg-hover);
 }
 
 .price-item-info {
@@ -1301,14 +1313,14 @@ const updatePriceItem = () => {
   display: block;
   margin-bottom: 0.5rem;
   font-weight: bold;
-  color: #2d3748;
+  color: var(--text-primary);
 }
 
 .form-group input,
 .form-group textarea {
   width: 100%;
   padding: 0.5rem;
-  border: 1px solid #cbd5e0;
+  border: 1px solid var(--border-color);
   border-radius: 4px;
   box-sizing: border-box;
 }
@@ -1330,7 +1342,7 @@ const updatePriceItem = () => {
     border-radius: 8px;
     margin-bottom: 1rem;
     border-right: none;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--border-color);
     padding: 0.75rem;
     max-height: 200px; /* Limit height of categories */
   }
@@ -1367,7 +1379,7 @@ const updatePriceItem = () => {
       flex-direction: column;
       align-items: flex-start;
       gap: 0.5rem;
-      background: #f8fafc;
+      background: var(--bg-input);
       padding: 0.75rem;
       border-radius: 6px;
       margin-bottom: 0.5rem;
@@ -1376,7 +1388,7 @@ const updatePriceItem = () => {
   .item-actions {
       width: 100%;
       justify-content: flex-end;
-      border-top: 1px solid #edf2f7;
+      border-top: 1px solid var(--border-color);
       padding-top: 0.5rem;
       margin-top: 0.25rem;
   }

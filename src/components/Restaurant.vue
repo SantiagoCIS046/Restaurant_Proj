@@ -491,7 +491,13 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, watch, onMounted } from "vue";
+import { useSettings } from "../composables/useSettings";
+
+const { settings } = useSettings();
+
+// Estados posibles de mesas
+const MESA_DISPONIBLE = "disponible";
 
 const props = defineProps({
   subView: {
@@ -669,8 +675,16 @@ function crearReserva() {
   // Crear o actualizar cliente automáticamente
   actualizarClienteDesdeReserva(nuevaReserva);
 
-  guardarMesas();
+  // Play sound if enabled
+  if (settings.notifications?.newOrderSound) {
+    // Audio simulation - in real app would be new Audio('/sound.mp3').play()
+    console.log("🔊 Ping! New Reservation Sound");
+  }
+
+  // Guardar cambios en localStorage
   guardarReservas();
+  guardarMesas();
+
   showReserveModal.value = false;
   reservation.value = {
     name: "",
@@ -872,7 +886,7 @@ onMounted(() => {
 
 .locations-sidebar {
   width: 250px;
-  background: #f8f9fa;
+  background: var(--bg-input);
   padding: 1rem;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -881,7 +895,7 @@ onMounted(() => {
 
 .locations-sidebar h3 {
   margin-bottom: 1rem;
-  color: #2d3748;
+  color: var(--text-primary);
 }
 
 .location-btn {
@@ -889,8 +903,8 @@ onMounted(() => {
   width: 100%;
   padding: 0.75rem;
   margin-bottom: 0.5rem;
-  background: white;
-  border: 1px solid #e2e8f0;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
   border-radius: 6px;
   cursor: pointer;
   text-align: left;
@@ -898,7 +912,7 @@ onMounted(() => {
 }
 
 .location-btn:hover {
-  background: #edf2f7;
+  background: var(--bg-hover);
 }
 
 .location-btn.active {
@@ -920,9 +934,9 @@ onMounted(() => {
   font-size: 14px;
   line-height: 1.5;
   padding: 12px;
-  border: 2px solid #e2e8f0;
+  border: 2px solid var(--border-color);
   border-radius: 8px;
-  background-color: #f8f9fa;
+  background-color: var(--bg-input);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -930,7 +944,7 @@ onMounted(() => {
   outline: none;
   border-color: #3182ce;
   box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
-  background-color: #ffffff;
+  background-color: var(--bg-card);
 }
 
 /* ========== RESPONSIVE DESIGN ========== */

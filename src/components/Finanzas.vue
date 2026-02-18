@@ -331,8 +331,10 @@ watch(selectedDate, () => {
   padding: 2rem;
   max-width: 1400px;
   margin: 0 auto;
-  color: #2d3748;
+  color: var(--text-primary);
   padding-bottom: 80px; /* Space for footer/nav if needed */
+  background: transparent; /* Remove gradient to use body bg or define a localized card-like bg if needed */
+  /* Actually user might want sticky header or something, but let's stick to simple var replacements */
 }
 
 /* Header */
@@ -346,32 +348,17 @@ watch(selectedDate, () => {
 .page-title {
   font-size: 2rem;
   font-weight: 700;
-  color: #e2e8f0; /* Light text for dark bg assumption or dark mode */
-}
-
-/* Adjust if global bg is light, but based on NavBar it seems dark theme oriented or mixed. 
-   Let's check other components. NavBar is dark. Reportes is light gradient. 
-   Let's assume a light card on a potentially light/gradient background from App?
-   Actually Reportes has its own background styling. Let's start neutral/light for content.
-*/
-.finanzas-container {
-  /* Using similar background to Reportes */
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-  min-height: calc(100vh - 60px); /* Adjust for navbar */
-  margin-top: 50px; /* Navbar height */
-  border-radius: 8px;
-}
-
-.page-title {
-  color: #2c3e50; /* Darker for light background */
+  color: var(--text-primary);
 }
 
 .date-input {
   padding: 0.5rem 1rem;
   border-radius: 8px;
-  border: 1px solid #cbd5e0;
+  border: 1px solid var(--border-color);
   font-size: 1rem;
   outline: none;
+  background: var(--bg-input);
+  color: var(--text-primary);
 }
 
 /* Summary Cards */
@@ -383,10 +370,10 @@ watch(selectedDate, () => {
 }
 
 .card {
-  background: white;
+  background: var(--bg-card);
   padding: 1.5rem;
   border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 6px var(--shadow-color);
   display: flex;
   align-items: center;
   gap: 1.5rem;
@@ -415,7 +402,7 @@ watch(selectedDate, () => {
 
 .card-info h3 {
   font-size: 0.9rem;
-  color: #718096;
+  color: var(--text-secondary);
   margin-bottom: 0.25rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -424,7 +411,7 @@ watch(selectedDate, () => {
 .card-info p {
   font-size: 1.5rem;
   font-weight: 700;
-  color: #2d3748;
+  color: var(--text-primary);
   margin: 0;
 }
 
@@ -446,10 +433,10 @@ watch(selectedDate, () => {
 }
 
 .chart-section {
-  background: white;
+  background: var(--bg-card);
   padding: 1.5rem;
   border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 6px var(--shadow-color);
   height: 400px;
   display: flex;
   flex-direction: column;
@@ -468,7 +455,7 @@ watch(selectedDate, () => {
 }
 
 .btn-add {
-  background: #3182ce;
+  background: var(--primary-color);
   color: white;
   border: none;
   padding: 1rem 2rem;
@@ -485,20 +472,20 @@ watch(selectedDate, () => {
 }
 
 .btn-add:hover {
-  background: #2b6cb0;
+  background: var(--primary-hover);
 }
 
 /* Transactions Table */
 .transactions-section {
-  background: white;
+  background: var(--bg-card);
   padding: 1.5rem;
   border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 6px var(--shadow-color);
 }
 
 .section-title {
   font-size: 1.25rem;
-  color: #2d3748;
+  color: var(--text-primary);
   margin-bottom: 1.5rem;
   font-weight: 600;
 }
@@ -515,16 +502,16 @@ watch(selectedDate, () => {
 .transactions-table th {
   text-align: left;
   padding: 1rem;
-  background: #f7fafc;
-  color: #4a5568;
+  background: var(--bg-input);
+  color: var(--text-secondary);
   font-weight: 600;
   font-size: 0.9rem;
 }
 
 .transactions-table td {
   padding: 1rem;
-  border-bottom: 1px solid #e2e8f0;
-  color: #2d3748;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-primary);
 }
 
 .transactions-table tr:last-child td {
@@ -539,8 +526,8 @@ watch(selectedDate, () => {
 }
 
 .category-badge {
-  background: #edf2f7;
-  color: #4a5568;
+  background: var(--bg-hover);
+  color: var(--text-secondary);
 }
 
 .badge-income {
@@ -564,13 +551,13 @@ watch(selectedDate, () => {
 }
 
 .btn-icon:hover {
-  background: #edf2f7;
+  background: var(--bg-hover);
   color: #e53e3e;
 }
 
 .no-data {
   text-align: center;
-  color: #a0aec0;
+  color: var(--text-secondary);
   padding: 2rem;
 }
 
@@ -589,7 +576,7 @@ watch(selectedDate, () => {
 }
 
 .modal-content {
-  background: white;
+  background: var(--bg-card);
   border-radius: 12px;
   width: 90%;
   max-width: 500px;
@@ -598,10 +585,14 @@ watch(selectedDate, () => {
 
 .modal-header {
   padding: 1.5rem;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--border-color);
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+.modal-header h3 {
+  color: var(--text-primary);
+  margin: 0; /* Add margin reset */
 }
 
 .modal-body {
@@ -610,7 +601,7 @@ watch(selectedDate, () => {
 
 .modal-footer {
   padding: 1.5rem;
-  border-top: 1px solid #e2e8f0;
+  border-top: 1px solid var(--border-color);
   display: flex;
   justify-content: flex-end;
   gap: 1rem;
@@ -621,7 +612,7 @@ watch(selectedDate, () => {
   border: none;
   font-size: 1.25rem;
   cursor: pointer;
-  color: #718096;
+  color: var(--text-secondary);
 }
 
 .form-group {
@@ -632,23 +623,25 @@ watch(selectedDate, () => {
   display: block;
   margin-bottom: 0.5rem;
   font-weight: 500;
-  color: #4a5568;
+  color: var(--text-secondary);
 }
 
 .form-group input,
 .form-group select {
   width: 100%;
   padding: 0.75rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border-color);
   border-radius: 8px;
   font-size: 1rem;
   transition: border-color 0.2s;
+  background: var(--bg-input);
+  color: var(--text-primary);
 }
 
 .form-group input:focus,
 .form-group select:focus {
   outline: none;
-  border-color: #3182ce;
+  border-color: var(--primary-color);
   box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
 }
 
@@ -660,12 +653,13 @@ watch(selectedDate, () => {
 .type-btn {
   flex: 1;
   padding: 0.75rem;
-  border: 1px solid #e2e8f0;
-  background: #f7fafc;
+  border: 1px solid var(--border-color);
+  background: var(--bg-input);
   border-radius: 8px;
   cursor: pointer;
   font-weight: 600;
   transition: all 0.2s;
+  color: var(--text-secondary);
 }
 
 .type-btn.active.income {
@@ -681,7 +675,7 @@ watch(selectedDate, () => {
 }
 
 .btn-save {
-  background: #3182ce;
+  background: var(--primary-color);
   color: white;
   border: none;
   padding: 0.75rem 1.5rem;
@@ -692,8 +686,8 @@ watch(selectedDate, () => {
 
 .btn-cancel {
   background: transparent;
-  color: #718096;
-  border: 1px solid #e2e8f0;
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
   padding: 0.75rem 1.5rem;
   border-radius: 8px;
   font-weight: 600;

@@ -536,7 +536,7 @@ const saveUserChanges = () => {
 }
 
 .card-footer {
-  border-top: 1px solid #edf2f7; paddingTop: 0.75rem; display: flex; justify-content: center; /* Reduced padding */
+  border-top: 1px solid #edf2f7; padding: 0.75rem; display: flex; justify-content: center; /* Reduced padding */
 }
 
 .status-indicator {
