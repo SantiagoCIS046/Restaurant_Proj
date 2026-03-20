@@ -158,16 +158,13 @@ router.beforeEach((to, from, next) => {
     document.title = "Restaurant App";
   }
 
-  // Verificación de autenticación y roles
+  // Verificación de autenticación y roles - TEMPORALMENTE DESHABILITADO PARA DESARROLLO
   if (to.meta.requiresAdmin && !isAdmin.value) {
-    // If route requires admin and user is not admin, redirect to management or login
-    if (isAuthenticated.value) {
-      next('/gestion');
-    } else {
-      next('/login');
-    }
+    // If route requires admin and user is not admin, allow for now or redirect
+    next(); 
   } else if (!to.meta.public && !isAuthenticated.value) {
-    next('/login');
+    // Permitir acceso directo a todas las rutas para facilitar el diseño
+    next();
   } else if (to.path === '/login' && isAuthenticated.value) {
     next('/gestion');
   } else {

@@ -23,6 +23,14 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+* {
+  box-sizing: border-box;
+}
+
+*, ::before, ::after {
+  box-sizing: border-box;
+}
+
 [data-theme='dark'] {
   /* Dark Theme Variables */
   --bg-body: #1a202c;
@@ -61,18 +69,18 @@ body {
 
 /* Global Container Responsive Padding */
 .container {
-  padding-top: 100px;
+  padding-top: 0;
 }
 
 @media (max-width: 1024px) {
   .container {
-    padding-top: 90px;
+    padding-top: 0;
   }
 }
 
 @media (max-width: 768px) {
   .container {
-    padding-top: 85px;
+    padding-top: 0;
   }
 }
 
@@ -155,8 +163,7 @@ button:focus-visible {
   padding: 1rem;
   /* Reduced padding */
   min-height: 100vh;
-  padding-top: 5rem;
-  /* Restored top padding */
+  padding-top: 0;
   box-sizing: border-box;
 }
 
@@ -719,15 +726,15 @@ button:focus-visible {
 /* Responsive Media Queries */
 @media (max-width: 1024px) {
   #app {
-    padding-top: 4.5rem;
+    padding-top: 0;
   }
 }
 
 @media (max-width: 768px) {
   #app {
     padding: 1rem;
-    padding-top: 8rem;
-    /* More space for fixed stacked headers if needed */
+    padding-top: 0;
+    /* Removed redundant 8rem padding */
   }
 
   h1 {

@@ -1,147 +1,110 @@
 <template>
   <nav class="navbar">
     <div class="navbar-container">
-      <!-- Logo / Brand Section (Optional, keeping as per previous structure but enhanced if needed) -->
-      <!-- The user requested the dropdown ON the user logo/info section -->
-
       <div class="logo">
         <i class="fas fa-utensils"></i>
-        <span>{{ settings.general?.name || "Restaurant" }}</span>
+        <span class="brand-text">Mi Restaurante</span>
       </div>
 
       <!-- Desktop Navigation -->
       <div class="nav-links desktop-menu">
-        <router-link to="/" class="nav-item" :class="{ active: isActive('/') }">
-          <i class="fas fa-home"></i> {{ t("dashboard") }}
+        <router-link to="/restaurant" class="main-nav-item" :class="{ active: isActive('/restaurant') }">
+          <i class="fas fa-th-large"></i>
+          <span>MESAS</span>
         </router-link>
-        <router-link
-          to="/restaurant"
-          class="nav-item"
-          :class="{ active: isActive('/restaurant') }"
-        >
-          <i class="fas fa-chair"></i> {{ t("tables") }}
+        <router-link to="/registro" class="main-nav-item" :class="{ active: isActive('/registro') }">
+          <i class="fas fa-clipboard-list"></i>
+          <span>REGISTRO</span>
         </router-link>
-        <router-link
-          to="/registro"
-          class="nav-item"
-          :class="{ active: isActive('/registro') }"
-        >
-          <i class="fas fa-clipboard-list"></i> {{ t("register") }}
+        <router-link to="/menu" class="main-nav-item" :class="{ active: isActive('/menu') }">
+          <i class="fas fa-utensils"></i>
+          <span>MENÚ</span>
         </router-link>
-        <router-link
-          to="/menu"
-          class="nav-item"
-          :class="{ active: isActive('/menu') }"
-        >
-          <i class="fas fa-book-open"></i> {{ t("menu") }}
+        <router-link to="/clientes" class="main-nav-item" :class="{ active: isActive('/clientes') }">
+          <i class="fas fa-users"></i>
+          <span>CLIENTES</span>
         </router-link>
-        <router-link
-          to="/clientes"
-          class="nav-item"
-          :class="{ active: isActive('/clientes') }"
-        >
-          <i class="fas fa-users"></i> {{ t("clients") }}
-        </router-link>
-
-        <!-- Admin Links -->
+        
         <template v-if="isAdmin">
-          <router-link
-            to="/pedidos"
-            class="nav-item"
-            :class="{ active: isActive('/pedidos') }"
-          >
-            <i class="fas fa-shopping-cart"></i> {{ t("orders") }}
+          <router-link to="/pedidos" class="main-nav-item" :class="{ active: isActive('/pedidos') }">
+            <i class="fas fa-shopping-basket"></i>
+            <span>PEDIDOS</span>
           </router-link>
-          <router-link
-            to="/inventario"
-            class="nav-item"
-            :class="{ active: isActive('/inventario') }"
-          >
-            <i class="fas fa-boxes"></i> {{ t("inventory") }}
+          <router-link to="/inventario" class="main-nav-item" :class="{ active: isActive('/inventario') }">
+            <i class="fas fa-box"></i>
+            <span>INVENTARIO</span>
           </router-link>
-          <router-link
-            to="/personal"
-            class="nav-item"
-            :class="{ active: isActive('/personal') }"
-          >
-            <i class="fas fa-user-tie"></i> {{ t("staff") }}
+          <router-link to="/personal" class="main-nav-item" :class="{ active: isActive('/personal') }">
+            <i class="fas fa-user-tie"></i>
+            <span>PERSONAL</span>
           </router-link>
-          <router-link
-            to="/finanzas"
-            class="nav-item"
-            :class="{ active: isActive('/finanzas') }"
-          >
-            <i class="fas fa-chart-line"></i> {{ t("finances") }}
+          <router-link to="/finanzas" class="main-nav-item" :class="{ active: isActive('/finanzas') }">
+            <i class="fas fa-chart-line"></i>
+            <span>FINANZAS</span>
           </router-link>
         </template>
 
-        <router-link
-          to="/configuracion"
-          class="nav-item"
-          :class="{ active: isActive('/configuracion') }"
-        >
-          <i class="fas fa-cogs"></i> {{ t("settings") }}
+        <router-link to="/configuracion" class="main-nav-item" :class="{ active: isActive('/configuracion') }">
+          <i class="fas fa-cog"></i>
+          <span>CONFIGURACIÓN</span>
         </router-link>
       </div>
 
-      <!-- User Profile Dropdown -->
-      <div
-        class="user-menu"
-        v-if="user"
-        @MouseEnter="showDropdown = true"
-        @MouseLeave="showDropdown = false"
-        @click="toggleDropdown"
-      >
-        <div class="user-info">
-          <div class="user-avatar">
-            <i
-              class="fas"
-              :class="user.role === 'admin' ? 'fa-user-tie' : 'fa-user'"
-            ></i>
-          </div>
-          <span class="user-name">{{ user.name }}</span>
-          <i class="fas fa-chevron-down dropdown-icon"></i>
+      <!-- User Info (Minimal Right) -->
+      <div class="user-profile-simple" v-if="user">
+        <span class="user-role-label">{{ user.name }}</span>
+        <div class="user-avatar-outline">
+          <img v-if="user.avatar" :src="user.avatar" alt="Avatar" />
+          <i v-else class="fas fa-user"></i>
         </div>
-
-        <!-- Dropdown Content -->
-        <transition name="dropdown-fade">
-          <div v-if="showDropdown" class="dropdown-content">
-            <div class="dropdown-header">
-              <span class="dropdown-role">{{
-                user.role === "admin" ? "Administrador" : "Personal"
-              }}</span>
-              <span class="dropdown-email">{{ user.email }}</span>
-            </div>
-
-            <div class="dropdown-divider"></div>
-
-            <template v-if="isAdmin">
-              <button class="dropdown-item" @click="navigateTo('usuarios')">
-                <i class="fas fa-users-cog"></i> Gestión de Usuarios
-              </button>
-            </template>
-
-            <button class="dropdown-item logout" @click="handleLogout">
-              <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
-            </button>
-          </div>
-        </transition>
       </div>
     </div>
   </nav>
 
-  <!-- Sub Nav (kept as is) -->
-  <div v-if="props.currentView === 'gestion'" class="sub-nav">
-    <button class="sub-nav-btn" @click="subNavigate('mesas')">Mesas</button>
-    <button class="sub-nav-btn" @click="subNavigate('mostrador')">
-      Mostrador
-    </button>
-    <button class="sub-nav-btn" @click="subNavigate('domicilio')">
-      Domicilio
-    </button>
-    <button class="sub-nav-btn" @click="subNavigate('mostraplus')">
-      MostraPlus
-    </button>
+  <!-- Sub Nav Bar -->
+  <div v-if="props.currentView === 'gestion'" class="sub-nav-bar">
+    <div class="sub-nav-container">
+      <div class="sub-nav-tabs">
+        <button 
+          class="sub-tab" 
+          :class="{ active: props.subView === 'mesas' }" 
+          @click="subNavigate('mesas')"
+        >Mesas</button>
+        <button 
+          class="sub-tab" 
+          :class="{ active: props.subView === 'mostrador' }" 
+          @click="subNavigate('mostrador')"
+        >Mostrador</button>
+        <button 
+          class="sub-tab" 
+          :class="{ active: props.subView === 'domicilio' }" 
+          @click="subNavigate('domicilio')"
+        >Domicilio</button>
+        <button 
+          class="sub-tab" 
+          :class="{ active: props.subView === 'mostraplus' }" 
+          @click="subNavigate('mostraplus')"
+        >MostraPlus</button>
+      </div>
+
+      <div class="sub-nav-actions">
+        <div class="search-box">
+          <i class="fas fa-search"></i>
+          <input 
+            type="text" 
+            :value="search" 
+            @input="$emit('update:search', $event.target.value)" 
+            placeholder="Buscar mesa..." 
+          />
+        </div>
+        <button class="icon-btn">
+          <i class="far fa-bell"></i>
+        </button>
+        <button class="icon-btn profile-outline">
+          <i class="far fa-user-circle"></i>
+        </button>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -162,9 +125,17 @@ const props = defineProps({
     type: String,
     default: "gestion",
   },
+  subView: {
+    type: String,
+    default: "mesas",
+  },
+  search: {
+    type: String,
+    default: "",
+  },
 });
 
-const emit = defineEmits(["navigate", "sub-navigate"]);
+const emit = defineEmits(["navigate", "sub-navigate", "update:search"]);
 const { user, isAdmin, logout } = useAuth();
 const showDropdown = ref(false);
 
@@ -186,20 +157,17 @@ const toggleDropdown = () => {
 };
 </script>
 
-<style scoped>
-.navbar {
+<style scoped>.navbar {
   display: flex;
   align-items: center;
-  justify-content: center;
   width: 100%;
-  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  background: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
   position: fixed;
   top: 0;
   left: 0;
   z-index: 1000;
-  height: 56px;
+  height: 60px;
   padding: 0 1.5rem;
 }
 
@@ -208,251 +176,218 @@ const toggleDropdown = () => {
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  max-width: 2000px;
-  gap: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
-/* Brand Logo */
 .logo {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  color: #fff;
-  font-weight: 700;
+  gap: 0.75rem;
+  color: #0038a8;
+  font-weight: 800;
   font-size: 1.1rem;
   flex-shrink: 0;
 }
 
 .logo i {
-  font-size: 1.2rem;
-  color: #f97316;
+  font-size: 1.35rem;
 }
 
-/* Navigation Links */
+.brand-text {
+  letter-spacing: -0.02em;
+}
+
 .nav-links {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: 1.5rem;
   flex: 1;
   justify-content: center;
-  overflow-x: auto;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  padding: 0 0.5rem;
-  max-width: 100%;
 }
 
-.nav-links::-webkit-scrollbar {
-  display: none;
-}
-
-.nav-item {
-  background: transparent;
-  border: none;
-  color: #cbd5e1;
-  font-size: 0.8rem;
-  font-weight: 500;
-  padding: 0.45rem 0.75rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  border-radius: 8px;
+.main-nav-item {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 0.4rem;
-  white-space: nowrap;
-  flex-shrink: 0;
+  gap: 0.25rem;
+  color: #64748b;
   text-decoration: none;
+  font-size: 0.6rem;
+  font-weight: 800;
+  padding: 0.4rem 0;
+  transition: all 0.2s ease;
+  min-width: 70px;
   position: relative;
 }
 
-.nav-item i {
-  font-size: 0.9rem;
-  opacity: 0.9;
-  flex-shrink: 0;
+.main-nav-item i {
+  font-size: 1.25rem;
+  margin-bottom: 2px;
 }
 
-.nav-item span {
-  font-size: 0.8rem;
+.main-nav-item:hover {
+  color: #1e293b;
 }
 
-.nav-item:hover {
-  background: rgba(255, 255, 255, 0.08);
-  color: #fff;
-  transform: translateY(-1px);
+.main-nav-item.active {
+  color: #0038a8;
 }
 
-.nav-item.active {
-  background: rgba(249, 115, 22, 0.15);
-  color: #fb923c;
-}
-
-.nav-item.active::after {
+.main-nav-item.active::after {
   content: "";
   position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 60%;
-  height: 2px;
-  background: #f97316;
-  border-radius: 2px 2px 0 0;
+  bottom: -6px;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: #0038a8;
+  border-radius: 3px 3px 0 0;
 }
 
-.nav-item:active {
-  transform: translateY(0);
-}
-
-/* User Menu */
-.user-menu {
-  position: relative;
-  cursor: pointer;
-
-  margin-left: 1rem;
-}
-
-.user-info {
+.user-profile-simple {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.1rem 0.5rem;
-  border-radius: 10px;
-  transition: all 0.5s ease;
-  color: white;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  gap: 1rem;
 }
 
-.user-info:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.2);
+.user-role-label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #1e293b;
 }
 
-.user-avatar {
-  width: 22px;
-  height: 22px;
-  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+.user-avatar-outline {
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
+  border: 2px solid #e2e8f0;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 2px solid rgba(255, 255, 255, 0.2);
-  font-size: 0.9rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  background: #f8fafc;
 }
 
-.user-name {
-  font-size: 0.85rem;
-  font-weight: 300;
-  letter-spacing: 0.01em;
+.user-avatar-outline i {
+  color: #94a3b8;
 }
 
-.dropdown-icon {
-  font-size: 0.7rem;
-  transition: transform 0.3s ease;
-  opacity: 0.7;
-}
-
-.user-menu:hover .dropdown-icon {
-  transform: rotate(180deg);
-  opacity: 1;
-}
-
-/* Dropdown */
-.dropdown-content {
-  position: absolute;
-  top: 60px;
-  right: 0;
-  width: 260px;
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-  padding: 0.75rem;
-  z-index: 1001;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  transform-origin: top right;
-}
-
-.dropdown-header {
-  padding: 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-  border-radius: 8px;
-  margin-bottom: 0.5rem;
-}
-
-.dropdown-role {
-  font-weight: 700;
-  color: #1e293b;
-  font-size: 0.95rem;
-  letter-spacing: -0.01em;
-}
-
-.dropdown-email {
-  font-size: 0.8rem;
-  color: #64748b;
-  font-weight: 500;
-}
-
-.dropdown-divider {
-  height: 1px;
-  background: linear-gradient(90deg, transparent, #e2e8f0, transparent);
-  margin: 0.5rem 0;
-}
-
-.dropdown-item {
+.user-avatar-outline img {
   width: 100%;
-  padding: 0.75rem 1rem;
-  background: transparent;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.2s ease;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Sub-nav Bar Styles */
+.sub-nav-bar {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  color: #334155;
-  font-size: 0.9rem;
-  font-weight: 500;
-  text-align: left;
+  width: 100%;
+  background: #ffffff;
+  border-bottom: 1px solid #f1f5f9;
+  position: fixed;
+  top: 60px;
+  left: 0;
+  z-index: 999;
+  height: 54px;
+  padding: 0 1.5rem;
 }
 
-.dropdown-item i {
-  width: 20px;
-  text-align: center;
-  font-size: 1rem;
+.sub-nav-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.sub-nav-tabs {
+  display: flex;
+  gap: 1rem;
+}
+
+.sub-tab {
+  padding: 0.45rem 1rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
   color: #64748b;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-.dropdown-item:hover {
-  background: #f8fafc;
+.sub-tab:hover {
   color: #1e293b;
-  transform: translateX(2px);
+  background: #f1f5f9;
 }
 
-.dropdown-item:hover i {
-  color: #f97316;
+.sub-tab.active {
+  background: #0038a8;
+  color: #ffffff;
 }
 
-.dropdown-item.logout {
-  color: #dc2626;
-  margin-top: 0.25rem;
+.sub-nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
 }
 
-.dropdown-item.logout i {
-  color: #dc2626;
+.search-box {
+  position: relative;
 }
 
-.dropdown-item.logout:hover {
-  background: #fef2f2;
-  color: #b91c1c;
+.search-box i {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94a3b8;
+  font-size: 0.9rem;
 }
 
-.dropdown-item.logout:hover i {
-  color: #b91c1c;
+.search-box input {
+  padding: 0.5rem 1rem 0.5rem 2.4rem;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  width: 240px;
+  font-size: 0.85rem;
+  transition: all 0.2s ease;
 }
 
+.search-box input:focus {
+  outline: none;
+  background: #ffffff;
+  border-color: #0038a8;
+  box-shadow: 0 0 0 4px rgba(0, 56, 168, 0.05);
+}
+
+.icon-btn {
+  background: transparent;
+  border: none;
+  color: #64748b;
+  font-size: 1.25rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.icon-btn:hover {
+  color: #1e293b;
+}
+
+.profile-outline {
+  font-size: 1.5rem;
+}
+
+/* Animations */
 .dropdown-fade-enter-active,
 .dropdown-fade-leave-active {
   transition: all 0.2s ease;
@@ -464,497 +399,29 @@ const toggleDropdown = () => {
   transform: scale(0.95) translateY(-10px);
 }
 
-/* Sub Navigation */
-.sub-nav {
-  display: flex;
-  justify-content: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1.5rem;
-  background: linear-gradient(135deg, #334155 0%, #1e293b 100%);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  position: fixed;
-  top: 56px;
-  left: 0;
-  width: 100%;
-  z-index: 999;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.sub-nav-btn {
-  background: transparent;
-  border: 1px solid rgba(249, 115, 22, 0.3);
-  color: #cbd5e1;
-  font-size: 0.85rem;
-  font-weight: 500;
-  padding: 0.5rem 1.25rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.sub-nav-btn:hover {
-  background: rgba(249, 115, 22, 0.1);
-  border-color: #f97316;
-  color: #fb923c;
-  transform: translateY(-1px);
-}
-
-.sub-nav-btn.active {
-  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
-  border-color: #f97316;
-  color: white;
-  box-shadow: 0 2px 8px rgba(249, 115, 22, 0.3);
-}
-
-/* Responsive */
-@media (max-width: 1400px) {
-  .navbar-container {
-    gap: 1rem;
-  }
-
-  .nav-links {
-    gap: 0.3rem;
-    padding: 0 0.5rem;
-  }
-
-  .nav-item {
-    font-size: 0.75rem;
-    padding: 0.4rem 0.65rem;
-    gap: 0.35rem;
-  }
-
-  .nav-item i {
-    font-size: 0.85rem;
-  }
-
-  .nav-item span {
-    font-size: 0.75rem;
-  }
-}
-
-@media (max-width: 1200px) {
-  .navbar {
-    height: 52px;
-    padding: 0 1rem;
-  }
-
-  .navbar-container {
-    gap: 0.75rem;
-  }
-
-  .logo {
-    font-size: 0.95rem;
-  }
-
-  .logo i {
-    font-size: 1.1rem;
-  }
-
-  .nav-links {
-    gap: 0.25rem;
-    padding: 0 0.4rem;
-  }
-
-  .nav-item {
-    font-size: 0.7rem;
-    padding: 0.4rem 0.6rem;
-    gap: 0.3rem;
-  }
-
-  .nav-item i {
-    font-size: 0.8rem;
-  }
-
-  .nav-item span {
-    font-size: 0.7rem;
-  }
-
-  .user-info {
-    padding: 0.35rem 0.75rem;
-    gap: 0.6rem;
-  }
-
-  .user-name {
-    font-size: 0.8rem;
-  }
-
-  .sub-nav {
-    top: 52px;
-    padding: 0.6rem 1rem;
-  }
-
-  .sub-nav-btn {
-    font-size: 0.8rem;
-    padding: 0.45rem 1rem;
-  }
-}
-
+/* Responsive Customization */
 @media (max-width: 1024px) {
-  .navbar {
-    height: 50px;
-    padding: 0 0.75rem;
-  }
-
-  .navbar-container {
-    gap: 0.5rem;
-  }
-
-  .logo span {
-    font-size: 0.85rem;
-  }
-
-  .nav-links {
-    gap: 0.2rem;
-    padding: 0 0.3rem;
-  }
-
-  .nav-item {
-    font-size: 0.65rem;
-    padding: 0.35rem 0.5rem;
-    gap: 0.25rem;
-  }
-
-  .nav-item i {
-    font-size: 0.75rem;
-  }
-
-  .nav-item span {
-    font-size: 0.65rem;
-  }
-
-  .user-avatar {
-    width: 28px;
-    height: 28px;
-    font-size: 0.8rem;
-  }
-
-  .user-name {
-    font-size: 0.75rem;
-  }
-
-  .sub-nav {
-    top: 50px;
-    padding: 0.5rem 0.75rem;
-  }
-
-  .sub-nav-btn {
-    font-size: 0.75rem;
-    padding: 0.4rem 0.9rem;
-  }
+  .logo span { display: none; }
+  .nav-links { gap: 0.5rem; }
+  .main-nav-item { min-width: 60px; font-size: 0.6rem; }
+  .search-box input { width: 180px; }
 }
 
 @media (max-width: 768px) {
-  .navbar {
-    padding: 0 0.5rem;
-    height: 48px;
-  }
-
-  .navbar-container {
-    gap: 0.4rem;
-  }
-
-  .logo {
-    font-size: 0.9rem;
-  }
-
-  .logo span {
-    display: none;
-  }
-
-  .logo i {
-    font-size: 1.1rem;
-  }
-
-  .nav-links {
-    gap: 0.2rem;
-    padding: 0 0.25rem;
-  }
-
-  .nav-item span {
-    display: none;
-  }
-
-  .nav-item {
-    padding: 0.45rem;
-    min-width: 36px;
-    justify-content: center;
-  }
-
-  .nav-item i {
-    font-size: 0.9rem;
-  }
-
-  .user-name {
-    display: none;
-  }
-
-  .user-info {
-    padding: 0.35rem 0.5rem;
-    gap: 0.4rem;
-  }
-
-  .user-avatar {
-    width: 26px;
-    height: 26px;
-    font-size: 0.75rem;
-  }
-
-  .dropdown-icon {
-    font-size: 0.65rem;
-  }
-
-  .dropdown-content {
-    right: 0;
-    top: 53px;
-    width: 240px;
-  }
-
-  .sub-nav {
-    top: 48px;
-    padding: 0.45rem 0.5rem;
-    gap: 0.3rem;
-  }
-
-  .sub-nav-btn {
-    font-size: 0.7rem;
-    padding: 0.35rem 0.75rem;
-  }
-
-  .sub-nav-btn span {
-    display: none;
-  }
-
-  .sub-nav-btn i {
-    font-size: 0.85rem;
-  }
-}
-
-@media (max-width: 600px) {
-  .navbar {
-    height: 44px;
-    padding: 0 0.4rem;
-  }
-
-  .navbar-container {
-    gap: 0.3rem;
-  }
-
-  .logo i {
-    font-size: 1rem;
-  }
-
-  .nav-links {
-    gap: 0.15rem;
-    padding: 0 0.2rem;
-  }
-
-  .nav-item {
-    padding: 0.4rem;
-    min-width: 34px;
-  }
-
-  .nav-item i {
-    font-size: 0.85rem;
-  }
-
-  .user-info {
-    padding: 0.3rem 0.45rem;
-  }
-
-  .user-avatar {
-    width: 24px;
-    height: 24px;
-    font-size: 0.7rem;
-  }
-
-  .dropdown-icon {
-    font-size: 0.6rem;
-  }
-
-  .dropdown-content {
-    top: 49px;
-    width: 220px;
-  }
-
-  .dropdown-header {
-    padding: 0.75rem;
-  }
-
-  .dropdown-item {
-    padding: 0.65rem 0.85rem;
-    font-size: 0.85rem;
-  }
-
-  .sub-nav {
-    top: 44px;
-    gap: 0.25rem;
-    padding: 0.4rem 0.4rem;
-  }
-
-  .sub-nav-btn {
-    font-size: 0.65rem;
-    padding: 0.3rem 0.65rem;
-  }
-
-  .sub-nav-btn i {
-    font-size: 0.8rem;
-  }
+  .navbar { padding: 0 1rem; height: 60px; }
+  .sub-nav-bar { top: 60px; height: auto; padding: 0.5rem 1rem; }
+  .sub-nav-container { flex-direction: column; gap: 1rem; }
+  .nav-links { justify-content: flex-start; overflow-x: auto; padding-bottom: 5px; }
+  .sub-nav-actions { width: 100%; justify-content: space-between; }
+  .search-box { flex: 1; }
+  .search-box input { width: 100%; }
 }
 
 @media (max-width: 480px) {
-  .navbar {
-    height: 42px;
-    padding: 0 0.3rem;
-  }
-
-  .navbar-container {
-    gap: 0.25rem;
-  }
-
-  .logo i {
-    font-size: 0.95rem;
-  }
-
-  .nav-links {
-    gap: 0.1rem;
-    padding: 0 0.15rem;
-  }
-
-  .nav-item {
-    padding: 0.35rem;
-    min-width: 32px;
-  }
-
-  .nav-item i {
-    font-size: 0.8rem;
-  }
-
-  .user-info {
-    padding: 0.25rem 0.4rem;
-  }
-
-  .user-avatar {
-    width: 22px;
-    height: 22px;
-    font-size: 0.65rem;
-  }
-
-  .dropdown-icon {
-    font-size: 0.55rem;
-  }
-
-  .dropdown-content {
-    top: 47px;
-    width: 200px;
-  }
-
-  .sub-nav {
-    top: 42px;
-    padding: 0.35rem 0.3rem;
-    gap: 0.2rem;
-  }
-
-  .sub-nav-btn {
-    font-size: 0.6rem;
-    padding: 0.25rem 0.55rem;
-  }
-
-  .sub-nav-btn i {
-    font-size: 0.75rem;
-  }
-}
-
-@media (max-width: 360px) {
-  .navbar {
-    height: 40px;
-    padding: 0 0.25rem;
-  }
-
-  .navbar-container {
-    gap: 0.2rem;
-  }
-
-  .logo i {
-    font-size: 0.9rem;
-  }
-
-  .nav-links {
-    gap: 0.08rem;
-    padding: 0 0.1rem;
-  }
-
-  .nav-item {
-    padding: 0.3rem;
-    min-width: 30px;
-  }
-
-  .nav-item i {
-    font-size: 0.75rem;
-  }
-
-  .user-info {
-    padding: 0.25rem 0.35rem;
-  }
-
-  .user-avatar {
-    width: 20px;
-    height: 20px;
-    font-size: 0.6rem;
-  }
-
-  .dropdown-icon {
-    font-size: 0.5rem;
-  }
-
-  .dropdown-content {
-    top: 45px;
-    width: 190px;
-  }
-
-  .dropdown-header {
-    padding: 0.65rem;
-  }
-
-  .dropdown-item {
-    padding: 0.6rem 0.75rem;
-    font-size: 0.8rem;
-  }
-
-  .sub-nav {
-    top: 40px;
-    padding: 0.3rem 0.25rem;
-    gap: 0.15rem;
-  }
-
-  .sub-nav-btn {
-    font-size: 0.55rem;
-    padding: 0.25rem 0.5rem;
-  }
-
-  .sub-nav-btn i {
-    font-size: 0.7rem;
-  }
-}
-
-@media (max-width: 360px) {
-  .navbar {
-    height: 40px;
-    padding: 0 0.25rem;
-  }
-
-  .nav-btn {
-    padding: 0.35rem;
-  }
-
-  .nav-btn i {
-    font-size: 0.95rem;
-  }
-
-  .sub-nav {
-    top: 40px;
-  }
+  .navbar { height: auto; padding: 0.5rem 1rem; flex-direction: column; gap: 0.5rem; }
+  .navbar-container { flex-direction: column; gap: 0.5rem; }
+  .nav-links { width: 100%; justify-content: center; }
+  .sub-nav-bar { top: unset; position: relative; }
+  .sub-tab { padding: 0.4rem 0.75rem; font-size: 0.8rem; }
 }
 </style>

@@ -1,126 +1,156 @@
 <template>
   <div class="container py-3">
     <div v-if="props.subView === 'mesas'" class="mesas-view">
-      <div class="header-container">
-        <h1>Gestión de Mesas</h1>
-        <div class="header-buttons">
-          <button class="add-table-btn" @click="showAddModal = true">
-            <i class="fas fa-plus"></i> Agregar
-          </button>
-          <button class="reserve-table-btn" @click="showSelectModal = true">
-            <i class="fas fa-calendar-check"></i> Reservar
-          </button>
-          <button
-            class="view-reservations-btn"
-            @click="showReservationsModal = true"
-          >
-            <i class="fas fa-list"></i> Reservas
-            <span class="reservations-badge" id="reservations-badge">{{
-              reservasActivas.length
-            }}</span>
-          </button>
-        </div>
-      </div>
+      <div class="main-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+          <div class="sidebar-section">
+            <h3 class="sidebar-title">UBICACIONES</h3>
+            <div class="location-filters">
+              <button
+                class="location-filter-btn"
+                :class="{ active: selectedLocation === 'all' }"
+                @click="selectedLocation = 'all'"
+              >
+                <i class="fas fa-th-large"></i> Todas
+              </button>
+              <button
+                v-for="location in mappedUbicaciones"
+                :key="location.name"
+                class="location-filter-btn"
+                :class="{ active: selectedLocation === location.name }"
+                @click="selectedLocation = location.name"
+              >
+                <i :class="location.icon"></i> {{ location.name }}
+              </button>
+            </div>
+          </div>
 
-      <div class="mesas-layout">
-        <div class="locations-sidebar">
-          <h3>Ubicaciones</h3>
-          <button
-            class="location-btn"
-            :class="{ active: selectedLocation === 'all' }"
-            @click="selectedLocation = 'all'"
-          >
-            Todas
-          </button>
-          <button
-            v-for="location in ubicaciones"
-            :key="location"
-            class="location-btn"
-            :class="{ active: selectedLocation === location }"
-            @click="selectedLocation = location"
-          >
-            {{ location }}
-          </button>
-        </div>
+          <div class="sidebar-section capacity-section">
+            <h3 class="sidebar-title">CAPACIDAD TOTAL</h3>
+            <div class="capacity-info">
+              <span class="capacity-text">
+                <span class="count">{{ currentOccupancy }}</span> / {{ totalCapacity }} personas
+              </span>
+              <div class="progress-bar">
+                <div class="progress-fill" :style="{ width: capacityPercentage + '%' }"></div>
+              </div>
+            </div>
+          </div>
+        </aside>
 
-        <div class="tables-main">
-          <div class="stats">
-            <div
-              class="stat-item"
-              v-for="estado in [
-                'disponible',
-                'reservada',
-                'ocupada',
-                'deshabilitada',
-              ]"
-              :key="estado"
-            >
-              <div class="stat-number">{{ countByState(estado) }}</div>
-              <div class="stat-label">
-                {{ estado.charAt(0).toUpperCase() + estado.slice(1) }}
+        <!-- Main Content -->
+        <main class="content-area">
+          <div class="content-header">
+            <div class="header-info">
+              <h1 class="page-title">Gestión de Mesas</h1>
+              <p class="page-subtitle">Control de disponibilidad y asignación en tiempo real.</p>
+            </div>
+            <div class="header-actions">
+              <button class="action-btn btn-add" @click="showAddModal = true">
+                <i class="fas fa-plus"></i> AGREGAR
+              </button>
+              <button class="action-btn btn-reserve" @click="showSelectModal = true">
+                <i class="fas fa-calendar-check"></i> RESERVAR
+              </button>
+              <button class="action-btn btn-reservations" @click="showReservationsModal = true">
+                <i class="fas fa-book"></i> RESERVAS
+                <span v-if="reservasActivas.length > 0" class="badge">{{ reservasActivas.length }}</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Stats Bar -->
+          <div class="stats-bar">
+            <div class="stat-card disponible">
+              <div class="stat-content">
+                <span class="stat-label">DISPONIBLE</span>
+                <span class="stat-value">{{ countByState('disponible') }}</span>
+              </div>
+              <div class="stat-icon-wrapper">
+                <i class="fas fa-check"></i>
+              </div>
+            </div>
+            <div class="stat-card reservada">
+              <div class="stat-content">
+                <span class="stat-label">RESERVADA</span>
+                <span class="stat-value">{{ countByState('reservada') }}</span>
+              </div>
+              <div class="stat-icon-wrapper">
+                <i class="fas fa-bookmark"></i>
+              </div>
+            </div>
+            <div class="stat-card ocupada">
+              <div class="stat-content">
+                <span class="stat-label">OCUPADA</span>
+                <span class="stat-value">{{ countByState('ocupada') }}</span>
+              </div>
+              <div class="stat-icon-wrapper">
+                <i class="fas fa-utensils"></i>
+              </div>
+            </div>
+            <div class="stat-card deshabilitada">
+              <div class="stat-content">
+                <span class="stat-label">DESHABILITADA</span>
+                <span class="stat-value">{{ countByState('deshabilitada') }}</span>
+              </div>
+              <div class="stat-icon-wrapper">
+                <i class="fas fa-ban"></i>
               </div>
             </div>
           </div>
 
-          <h2>
-            Mesas en
-            {{
-              selectedLocation === "all"
-                ? "Todas las Ubicaciones"
-                : selectedLocation
-            }}
-          </h2>
           <div class="table-grid">
             <div
-              v-for="mesa in filteredMesas"
+              v-for="mesa in filteredAndSearchedMesas"
               :key="mesa.id"
-              v-memo="[mesa.estado, mesa.capacidad, mesa.ubicacion]"
               class="table-card"
               :class="mesa.estado"
             >
-              <div class="table-header">
-                <div class="table-id">{{ mesa.id.toUpperCase() }}</div>
+              <div class="card-header">
+                <div class="table-title">
+                  <span class="label">MESA</span>
+                  <span class="id">{{ mesa.id.replace('mesa', '') }}</span>
+                </div>
+                <div class="status-badge" :class="mesa.estado">
+                  {{ mesa.estado.toUpperCase() }}
+                </div>
               </div>
-              <div class="table-info">
-                <span><i class="fas fa-users"></i> {{ mesa.capacidad }}</span>
-                <span
-                  ><i class="fas fa-map-marker-alt"></i>
-                  {{ mesa.ubicacion }}</span
-                >
+
+              <div class="card-body">
+                <div class="info-row">
+                  <i class="fas fa-user"></i>
+                  <span>Capacidad: {{ mesa.capacidad }}</span>
+                </div>
+                <div class="info-row">
+                  <i class="fas fa-map-marker-alt"></i>
+                  <span>{{ mesa.ubicacion }}</span>
+                </div>
               </div>
-              <select
-                v-model="mesa.estado"
-                @change="guardarMesasDebounced"
-                class="status-select"
-              >
-                <option value="disponible">Disponible</option>
-                <option value="reservada">Reservada</option>
-                <option value="ocupada">Ocupada</option>
-                <option value="deshabilitada">Deshabilitada</option>
-              </select>
-              <div
-                class="card-actions"
-                style="display: flex; gap: 0.5rem; margin-top: auto"
-              >
-                <button
-                  class="delete-btn"
-                  style="flex: 1"
-                  @click="eliminarMesa(mesa.id)"
+
+              <div class="card-footer">
+                <select
+                  v-model="mesa.estado"
+                  @change="guardarMesasDebounced"
+                  class="status-dropdown"
                 >
-                  <i class="fas fa-trash"></i>
-                </button>
-                <button
-                  v-if="mesa.estado === 'disponible'"
-                  class="reserve-btn"
-                  style="flex: 1"
-                  @click="abrirReserva(mesa)"
-                >
-                  <i class="fas fa-calendar-plus"></i>
-                </button>
+                  <option value="disponible">Disponible</option>
+                  <option value="reservada">Reservada</option>
+                  <option value="ocupada">Ocupada</option>
+                  <option value="deshabilitada">Deshabilitada</option>
+                </select>
+                <div class="card-actions">
+                  <button class="btn-action btn-delete" @click="eliminarMesa(mesa.id)">
+                    <i class="fas fa-times"></i>
+                  </button>
+                  <button class="btn-action btn-edit" @click="abrirReserva(mesa)">
+                    <i class="fas fa-pen"></i>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        </main>
       </div>
     </div>
 
@@ -161,11 +191,7 @@
             <label for="table-location">Ubicación:</label>
             <select id="table-location" v-model="newTable.location" required>
               <option value="">Seleccionar ubicación...</option>
-              <option value="Ventana">Ventana</option>
-              <option value="Jardín">Jardín</option>
-              <option value="Interior">Interior</option>
-              <option value="Terraza">Terraza</option>
-              <option value="VIP">VIP</option>
+              <option v-for="loc in ubicaciones" :key="loc" :value="loc">{{ loc }}</option>
             </select>
           </div>
           <div class="form-actions">
@@ -259,11 +285,7 @@
                 required
               >
                 <option value="">Seleccionar lugar...</option>
-                <option value="Ventana">Ventana</option>
-                <option value="Jardín">Jardín</option>
-                <option value="Interior">Interior</option>
-                <option value="Terraza">Terraza</option>
-                <option value="VIP">VIP</option>
+                <option v-for="loc in ubicaciones" :key="loc" :value="loc">{{ loc }}</option>
               </select>
             </div>
             <div class="form-group">
@@ -504,6 +526,10 @@ const props = defineProps({
     type: String,
     default: "mesas",
   },
+  searchQuery: {
+    type: String,
+    default: "",
+  },
 });
 
 // === Estado ===
@@ -520,6 +546,13 @@ const showSelectModal = ref(false);
 const showReservationsModal = ref(false);
 const showLocationsModal = ref(false);
 const selectedLocation = ref("all");
+
+const mappedUbicaciones = computed(() => [
+  { name: "Terraza", icon: "fas fa-umbrella-beach" },
+  { name: "Salón Principal", icon: "fas fa-couch" },
+  { name: "Barra", icon: "fas fa-glass-martini-alt" },
+  { name: "VIP Privado", icon: "fas fa-star" },
+]);
 
 const newTable = ref({
   capacity: "",
@@ -545,28 +578,22 @@ const today = computed(() => {
 });
 
 const ubicaciones = computed(() => [
-  "Ventana",
-  "Jardín",
-  "Interior",
   "Terraza",
-  "VIP",
+  "Salón Principal",
+  "Barra",
+  "VIP Privado",
 ]);
 
 // === Funciones de persistencia ===
 function inicializarMesas() {
   if (!localStorage.getItem("mesasRestaurante")) {
     const mesasIniciales = [
-      { id: "mesa1", capacidad: 2, ubicacion: "Ventana", estado: "disponible" },
-      { id: "mesa2", capacidad: 4, ubicacion: "Jardín", estado: "disponible" },
-      {
-        id: "mesa3",
-        capacidad: 6,
-        ubicacion: "Interior",
-        estado: "disponible",
-      },
-      { id: "mesa4", capacidad: 2, ubicacion: "Ventana", estado: "disponible" },
-      { id: "mesa5", capacidad: 4, ubicacion: "Terraza", estado: "disponible" },
-      { id: "mesa6", capacidad: 8, ubicacion: "VIP", estado: "disponible" },
+      { id: "mesa1", capacidad: 4, ubicacion: "Terraza", estado: "disponible" },
+      { id: "mesa2", capacidad: 2, ubicacion: "Barra", estado: "ocupada" },
+      { id: "mesa3", capacidad: 6, ubicacion: "Terraza", estado: "reservada" },
+      { id: "mesa4", capacidad: 4, ubicacion: "Terraza", estado: "deshabilitada" },
+      { id: "mesa5", capacidad: 8, ubicacion: "VIP Privado", estado: "disponible" },
+      { id: "mesa6", capacidad: 4, ubicacion: "Salón Principal", estado: "disponible" },
     ];
     localStorage.setItem("mesasRestaurante", JSON.stringify(mesasIniciales));
   }
@@ -852,13 +879,37 @@ function getTablesByLocation(location) {
   return mesas.value.filter((mesa) => mesa.ubicacion === location);
 }
 
-const filteredMesas = computed(() => {
-  if (selectedLocation.value === "all") {
-    return mesas.value;
+const filteredAndSearchedMesas = computed(() => {
+  let result = mesas.value;
+
+  if (selectedLocation.value !== "all") {
+    result = result.filter((m) => m.ubicacion === selectedLocation.value);
   }
-  return mesas.value.filter(
-    (mesa) => mesa.ubicacion === selectedLocation.value
-  );
+
+  if (props.searchQuery) {
+    const q = props.searchQuery.toLowerCase();
+    result = result.filter(
+      (m) =>
+        m.id.toLowerCase().includes(q) || m.ubicacion.toLowerCase().includes(q)
+    );
+  }
+
+  return result;
+});
+
+const totalCapacity = computed(() => {
+  return mesas.value.reduce((total, m) => total + m.capacidad, 0);
+});
+
+const currentOccupancy = computed(() => {
+  return mesas.value
+    .filter((m) => m.estado === "ocupada" || m.estado === "reservada")
+    .reduce((total, m) => total + m.capacidad, 0);
+});
+
+const capacityPercentage = computed(() => {
+  if (totalCapacity.value === 0) return 0;
+  return (currentOccupancy.value / totalCapacity.value) * 100;
 });
 
 // === Ciclo de vida ===
@@ -876,355 +927,524 @@ onMounted(() => {
 @import "../style.css";
 
 .container {
-  padding-top: 100px; /* Adjust to account for fixed navbar and sub-nav */
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 1rem;
+  padding-top: 114px;
+  min-height: calc(100vh - 56px);
 }
 
-.mesas-layout {
+.main-layout {
   display: flex;
   gap: 2rem;
+  align-items: flex-start;
 }
 
-.locations-sidebar {
-  width: 250px;
-  background: var(--bg-input);
-  padding: 1rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  height: fit-content;
+/* Sidebar Styling */
+.sidebar {
+  width: 220px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  position: fixed;
+  top: 114px;
+  bottom: 1.5rem;
+  overflow-y: auto;
+  padding-right: 0.5rem;
 }
 
-.locations-sidebar h3 {
-  margin-bottom: 1rem;
-  color: var(--text-primary);
+/* Custom scrollbar for sidebar */
+.sidebar::-webkit-scrollbar {
+  width: 4px;
+}
+.sidebar::-webkit-scrollbar-thumb {
+  background: #e2e8f0;
+  border-radius: 4px;
 }
 
-.location-btn {
-  display: block;
-  width: 100%;
-  padding: 0.75rem;
-  margin-bottom: 0.5rem;
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
+.sidebar-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.sidebar-title {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #64748b;
+  letter-spacing: 0.1em;
+  margin: 0;
+  padding-left: 0.5rem;
+}
+
+.location-filters {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.location-filter-btn {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.6rem 0.8rem;
+  border-radius: 10px;
+  border: 2px solid transparent;
+  background: transparent;
+  color: #64748b;
+  font-weight: 600;
+  font-size: 0.85rem;
   cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   text-align: left;
+}
+
+.location-filter-btn i {
+  width: 20px;
+  text-align: center;
+  font-size: 1.1rem;
+  transition: transform 0.2s ease;
+}
+
+.location-filter-btn:hover {
+  background: #f1f5f9;
+  color: #1e293b;
+  transform: translateX(4px);
+}
+
+.location-filter-btn.active {
+  background: #fff;
+  border-color: #3b82f6;
+  color: #3b82f6;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+}
+
+.location-filter-btn.active i {
+  transform: scale(1.1);
+}
+
+/* Capacity Indicator */
+.capacity-info {
+  background: #fff;
+  padding: 1rem;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.capacity-text {
+  font-size: 0.8rem;
+  color: #64748b;
+  font-weight: 600;
+}
+
+.capacity-text .count {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #1e293b;
+}
+
+.progress-bar {
+  height: 8px;
+  background: #f1f5f9;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #3b82f6, #60a5fa);
+  border-radius: 4px;
+  transition: width 0.5s ease-out;
+}
+
+/* Content Area */
+.content-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-left: 240px;
+}
+
+.content-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 2rem;
+  position: sticky;
+  top: 114px;
+  background: #f8fafc;
+  z-index: 10;
+  padding: 0.25rem 0 0.75rem 0;
+}
+
+.page-title {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #1e293b;
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.page-subtitle {
+  color: #64748b;
+  margin: 0.2rem 0 0;
+  font-size: 0.85rem;
+}
+
+.header-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.action-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.55rem 1rem;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 0.75rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  letter-spacing: 0.02em;
+}
+
+.btn-add {
+  background: #059669;
+  color: white;
+}
+
+.btn-add:hover {
+  background: #047857;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(5, 150, 105, 0.2);
+}
+
+.btn-reserve {
+  background: #2563eb;
+  color: white;
+}
+
+.btn-reserve:hover {
+  background: #1d4ed8;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+}
+
+.btn-reservations {
+  background: #78350f;
+  color: white;
+}
+
+.btn-reservations:hover {
+  background: #451a03;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(120, 53, 15, 0.2);
+}
+
+.btn-reservations .badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: #ef4444;
+  color: white;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  border: 2px solid #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Stats Bar */
+.stats-bar {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.25rem;
+  position: sticky;
+  top: 175px; /* Adjusted to sit below content-header */
+  background: #f8fafc;
+  z-index: 9;
+  padding-bottom: 0.75rem;
+}
+
+.stat-card {
+  background: #fff;
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-width: 0 0 0 4px;
+  border-style: solid;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+}
+
+.stat-card.disponible { border-color: #10b981; }
+.stat-card.reservada { border-color: #3b82f6; }
+.stat-card.ocupada { border-color: #f59e0b; }
+.stat-card.deshabilitada { border-color: #ef4444; }
+
+.stat-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.stat-label {
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: #64748b;
+  letter-spacing: 0.05em;
+}
+
+.stat-value {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #1e293b;
+  line-height: 1;
+}
+
+.stat-icon-wrapper {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+}
+
+.stat-card.disponible .stat-icon-wrapper { background: #ecfdf5; color: #10b981; }
+.stat-card.reservada .stat-icon-wrapper { background: #eff6ff; color: #3b82f6; }
+.stat-card.ocupada .stat-icon-wrapper { background: #fffbeb; color: #f59e0b; }
+.stat-card.deshabilitada .stat-icon-wrapper { background: #fef2f2; color: #ef4444; }
+
+/* Search Bar */
+.search-bar-container {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: -0.5rem;
+}
+
+.search-input-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 320px;
+}
+
+.search-input-wrapper i {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94a3b8;
+}
+
+.search-input {
+  width: 100%;
+  padding: 0.55rem 1rem 0.55rem 2.4rem;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  font-size: 0.85rem;
   transition: all 0.2s ease;
 }
 
-.location-btn:hover {
-  background: var(--bg-hover);
-}
-
-.location-btn.active {
-  background: #3182ce;
-  color: white;
-  border-color: #3182ce;
-}
-
-.tables-main {
-  flex: 1;
-}
-
-/* Estilos para el textarea de notas */
-.notes-textarea {
-  resize: vertical;
-  min-height: 100px;
-  width: 100%;
-  font-family: inherit;
-  font-size: 14px;
-  line-height: 1.5;
-  padding: 12px;
-  border: 2px solid var(--border-color);
-  border-radius: 8px;
-  background-color: var(--bg-input);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-.notes-textarea:focus {
+.search-input:focus {
   outline: none;
-  border-color: #3182ce;
-  box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
-  background-color: var(--bg-card);
+  border-color: #3b82f6;
+  background: #fff;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.05);
 }
 
-/* ========== RESPONSIVE DESIGN ========== */
-
-/* Tablet and below */
-@media (max-width: 1024px) {
-  .container {
-    padding-top: 90px;
-    padding-left: 1rem;
-    padding-right: 1rem;
-  }
-
-  .mesas-layout {
-    gap: 1.5rem;
-  }
-
-  .locations-sidebar {
-    width: 200px;
-  }
-
-  .header-buttons {
-    flex-wrap: wrap;
-    gap: 0.5rem;
-  }
-
-  .add-table-btn,
-  .reserve-table-btn,
-  .view-reservations-btn {
-    font-size: 0.9rem;
-    padding: 0.65rem 1rem;
-  }
+/* Grid & Cards */
+.table-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1.5rem;
 }
 
-/* Mobile landscape and tablet portrait */
+.table-card {
+  background: white;
+  border-radius: 12px;
+  padding: 0.8rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  border: 1px solid #f1f5f9;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.table-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 20px -5px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.table-title {
+  display: flex;
+  flex-direction: column;
+}
+
+.table-title .label {
+  font-size: 0.6rem;
+  font-weight: 800;
+  color: #94a3b8;
+  letter-spacing: 0.05em;
+}
+
+.table-title .id {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #1e293b;
+}
+
+.status-badge {
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding: 0.25rem 0.6rem;
+  border-radius: 6px;
+  letter-spacing: 0.05em;
+}
+
+.status-badge.disponible { background: #ecfdf5; color: #10b981; }
+.status-badge.reservada { background: #eff6ff; color: #3b82f6; }
+.status-badge.ocupada { background: #fff7ed; color: #f97316; }
+.status-badge.deshabilitada { background: #fef2f2; color: #ef4444; }
+
+.card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.info-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #64748b;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.info-row i {
+  color: #94a3b8;
+  width: 14px;
+}
+
+.card-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: auto;
+}
+
+.status-dropdown {
+  width: 100%;
+  padding: 0.4rem 0.5rem;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #1e293b;
+  cursor: pointer;
+}
+
+.card-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.btn-action {
+  flex: 1;
+  padding: 0.45rem;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-delete { background: #fee2e2; color: #ef4444; }
+.btn-delete:hover { background: #fecaca; }
+
+.btn-edit { background: #dbeafe; color: #2563eb; }
+.btn-edit:hover { background: #bfdbfe; }
+
+/* Modal Adjustments */
+.modal-content {
+  border-radius: 24px;
+  border: none;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+.form-group label {
+  color: #64748b;
+  text-transform: uppercase;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+}
+
+.form-group input, .form-group select, .form-group textarea {
+  border-radius: 12px;
+  border: 2px solid #f1f5f9;
+  background: #f8fafc;
+}
+
+.form-group input:focus, .form-group select:focus {
+  border-color: #3b82f6;
+  background: #fff;
+}
+
+/* Responsive Customization */
+@media (max-width: 1200px) {
+  .sidebar { width: 220px; }
+  .content-area { margin-left: 240px; }
+  .stats-bar { grid-template-columns: repeat(2, 1fr); }
+}
+
 @media (max-width: 768px) {
-  .container {
-    padding-top: 85px;
-    padding-left: 0.75rem;
-    padding-right: 0.75rem;
-  }
-
-  .mesas-layout {
-    flex-direction: column;
-    gap: 1rem;
-  }
-
-  .locations-sidebar {
-    width: 100%;
-    padding: 0.75rem;
-  }
-
-  .location-btn {
-    padding: 0.6rem;
-    font-size: 0.9rem;
-  }
-
-  .header-container {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 1rem;
-  }
-
-  .header-container h1 {
-    font-size: 1.5rem;
-  }
-
-  .header-buttons {
-    width: 100%;
-    justify-content: flex-start;
-  }
-
-  .stats {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.75rem;
-  }
-
-  .stat-item {
-    padding: 0.75rem;
-  }
-
-  .stat-number {
-    font-size: 1.75rem;
-  }
-
-  .stat-label {
-    font-size: 0.85rem;
-  }
-
-  .table-grid {
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 1rem;
-  }
-
-  .modal-content {
-    width: 95%;
-    max-width: 500px;
-    padding: 1.5rem;
-    margin: 1rem;
-  }
-
-  .large-modal {
-    max-width: 95%;
-  }
-
-  .form-row {
-    flex-direction: column;
-  }
-
-  .form-group {
-    margin-bottom: 1rem;
-  }
+  .container { padding-top: 180px; }
+  .main-layout { flex-direction: column; }
+  .sidebar { position: static; width: 100%; height: auto; margin-bottom: 2rem; border-right: none; }
+  .content-area { margin-left: 0; }
+  .location-filters { flex-direction: row; overflow-x: auto; padding-bottom: 0.5rem; gap: 0.5rem; }
+  .location-filter-btn { white-space: nowrap; flex-shrink: 0; }
+  .content-header { flex-direction: column; align-items: stretch; gap: 1rem; position: static; }
+  .header-actions { flex-direction: row; flex-wrap: wrap; }
 }
 
-/* Mobile portrait */
-@media (max-width: 600px) {
-  .container {
-    padding-top: 75px;
-    padding-left: 0.5rem;
-    padding-right: 0.5rem;
-  }
-
-  .header-container h1 {
-    font-size: 1.25rem;
-  }
-
-  .header-buttons {
-    flex-direction: column;
-    width: 100%;
-  }
-
-  .add-table-btn,
-  .reserve-table-btn,
-  .view-reservations-btn {
-    width: 100%;
-    justify-content: center;
-    font-size: 0.85rem;
-    padding: 0.75rem;
-  }
-
-  .reservations-badge {
-    position: static;
-    margin-left: 0.5rem;
-  }
-
-  .stats {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.5rem;
-  }
-
-  .stat-item {
-    padding: 0.5rem;
-  }
-
-  .stat-number {
-    font-size: 1.5rem;
-  }
-
-  .stat-label {
-    font-size: 0.75rem;
-  }
-
-  .table-grid {
-    grid-template-columns: 1fr;
-    gap: 0.75rem;
-  }
-
-  .table-card {
-    padding: 1rem;
-  }
-
-  .table-id {
-    font-size: 1rem;
-  }
-
-  .table-info {
-    font-size: 0.85rem;
-  }
-
-  .status-select {
-    font-size: 0.85rem;
-    padding: 0.5rem;
-  }
-
-  .delete-btn,
-  .reserve-btn {
-    font-size: 0.85rem;
-    padding: 0.5rem;
-  }
-
-  .modal-content {
-    width: 95%;
-    padding: 1rem;
-    margin: 0.5rem;
-    border-radius: 12px;
-  }
-
-  .modal-content h2 {
-    font-size: 1.25rem;
-    margin-bottom: 1rem;
-  }
-
-  .close {
-    font-size: 1.75rem;
-    top: 0.5rem;
-    right: 0.75rem;
-  }
-
-  .form-group label {
-    font-size: 0.85rem;
-  }
-
-  .form-group input,
-  .form-group select,
-  .form-group textarea {
-    font-size: 0.9rem;
-    padding: 0.65rem;
-  }
-
-  .modal-actions button {
-    font-size: 0.9rem;
-    padding: 0.65rem 1.25rem;
-  }
-
-  .available-table-card,
-  .location-table-card,
-  .reservation-card {
-    padding: 0.75rem;
-  }
-
-  .available-table-id,
-  .location-table-id {
-    font-size: 0.95rem;
-  }
-
-  .available-table-info-item,
-  .location-table-info-item,
-  .info-item {
-    font-size: 0.85rem;
-  }
-
-  .select-table-btn {
-    font-size: 0.85rem;
-    padding: 0.5rem;
-  }
-
-  .delete-reservation-btn {
-    font-size: 0.85rem;
-    padding: 0.5rem 1rem;
-  }
-}
-
-/* Extra small devices */
-@media (max-width: 360px) {
-  .container {
-    padding-top: 70px;
-    padding-left: 0.25rem;
-    padding-right: 0.25rem;
-  }
-
-  .header-container h1 {
-    font-size: 1.1rem;
-  }
-
-  .stats {
-    grid-template-columns: 1fr;
-  }
-
-  .add-table-btn,
-  .reserve-table-btn,
-  .view-reservations-btn {
-    font-size: 0.8rem;
-    padding: 0.65rem;
-  }
-
-  .modal-content {
-    padding: 0.75rem;
-  }
-
-  .modal-content h2 {
-    font-size: 1.1rem;
-  }
+@media (max-width: 480px) {
+  .stats-bar { grid-template-columns: 1fr; }
+  .table-grid { grid-template-columns: 1fr; }
 }
 </style>

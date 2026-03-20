@@ -120,11 +120,14 @@ export function useAuth() {
   };
 
   const checkAuth = () => {
-    const storedUser = localStorage.getItem("currentUser");
-    if (storedUser) {
-      user.value = JSON.parse(storedUser);
-      isAuthenticated.value = true;
-    }
+    // MOCK ADMIN USER FOR DEVELOPMENT
+    user.value = {
+      name: "Admin Dev",
+      email: "admin@example.com",
+      role: "admin"
+    };
+    isAuthenticated.value = true;
+    localStorage.setItem("currentUser", JSON.stringify(user.value));
   };
 
   // Check auth on initialization

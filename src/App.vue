@@ -67,6 +67,7 @@ watch(() => settings.security?.autoLogout, (enabled) => {
 
 // Estado para sub-vistas (si es necesario mantener esta funcionalidad)
 const subView = ref("mesas");
+const globalSearch = ref("");
 
 // Computed para obtener la vista actual desde la ruta
 const currentView = computed(() => {
@@ -95,11 +96,13 @@ const handleSubNavigate = (subSection) => {
   <NavBar
     v-if="!isLoginPage"
     :current-view="currentView"
+    :sub-view="subView"
+    v-model:search="globalSearch"
     @navigate="handleNavigate"
     @sub-navigate="handleSubNavigate"
   />
   <!-- RouterView renderiza el componente correspondiente a la ruta actual -->
-  <router-view :sub-view="subView" />
+  <router-view :sub-view="subView" :search-query="globalSearch" />
 </template>
 
 <style scoped></style>
