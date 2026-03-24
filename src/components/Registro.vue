@@ -14,6 +14,7 @@
               type="date" 
               v-model="selectedDate" 
               class="hero-date-input"
+              :max="today"
               @change="filterByDate"
             />
           </div>
@@ -162,7 +163,8 @@
 import { ref, computed, onMounted } from "vue";
 
 // Datos reactivos
-const selectedDate = ref(new Date().toISOString().split("T")[0]);
+const today = new Date().toISOString().split("T")[0];
+const selectedDate = ref(today);
 const currentView = ref("overview");
 const localSearchQuery = ref(""); // New search query for the table
 const mesas = ref([]);
@@ -495,16 +497,24 @@ onMounted(() => {
 .registro-view {
   min-height: 100vh;
   background-color: #f8fafc;
-  padding-top: 114px; /* Space for NavBar */
+  padding-top: 56px; /* High-speed flush alignment with single 56px NavBar */
   font-family: 'Inter', sans-serif;
 }
 
 /* Hero Banner */
 .hero-banner {
   background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
-  padding: 30px 40px;
+  padding: 1.5rem 2.5rem;
   color: white;
   margin-bottom: 20px;
+  position: sticky;
+  top: 56px; /* Align with bottom of fixed single-nav */
+  z-index: 50;
+  border-radius: 0 0 16px 16px; /* Removed top corners for flush look */
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: none; /* No border against the navbar */
 }
 
 .hero-content {
@@ -534,28 +544,37 @@ onMounted(() => {
 }
 
 .date-picker-wrapper {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 8px;
-  padding: 8px 15px;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
+  padding: 10px 18px;
   display: flex;
   align-items: center;
-  gap: 10px;
-  backdrop-filter: blur(5px);
+  gap: 12px;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+.date-picker-wrapper:focus-within {
+  background: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.5);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
 }
 
 .date-picker-wrapper i {
   color: #fff;
-  font-size: 0.9rem;
+  font-size: 1rem;
+  opacity: 0.9;
 }
 
 .hero-date-input {
   background: transparent;
   border: none;
   color: white;
-  font-weight: 600;
-  font-size: 0.9rem;
+  font-weight: 700;
+  font-size: 0.95rem;
   outline: none;
+  cursor: pointer;
 }
 
 .hero-date-input::-webkit-calendar-picker-indicator {
@@ -564,25 +583,30 @@ onMounted(() => {
 }
 
 .export-btn {
-  background: white;
+  background: #ffffff;
   color: #1e40af;
   border: none;
-  border-radius: 8px;
-  padding: 10px 20px;
+  border-radius: 12px;
+  padding: 12px 28px;
   font-weight: 700;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
 .export-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.15);
-  background: #f1f5f9;
+  transform: translateY(-2px);
+  box-shadow: 0 12px 20px -5px rgba(0, 0, 0, 0.2);
+  background: #f8fafc;
+  color: #2563eb;
+}
+
+.export-btn:active {
+  transform: translateY(0);
 }
 
 /* Container */
@@ -596,52 +620,54 @@ onMounted(() => {
   display: flex;
   align-items: center;
   gap: 15px;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
 }
 
 .section-header h2 {
-  font-size: 1.1rem;
+  font-size: 1.25rem;
   font-weight: 800;
-  color: #1e293b;
+  color: #0f172a;
   margin: 0;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: -0.02em;
 }
 
 .update-tag {
-  background: #e2e8f0;
+  background: #f1f5f9;
   color: #64748b;
   font-size: 0.7rem;
   font-weight: 700;
-  padding: 4px 8px;
-  border-radius: 4px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 /* Stats Grid */
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 20px;
-  margin-bottom: 40px;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+  margin-bottom: 48px;
 }
 
 .stat-card {
   background: white;
-  border-radius: 12px;
-  padding: 20px;
+  border-radius: 16px;
+  padding: 24px;
   display: flex;
   align-items: center;
-  gap: 15px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  gap: 20px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
   border: 1px solid #f1f5f9;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .stat-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-  border-color: #3b82f6;
+  transform: translateY(-4px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  border-color: #cbd5e1;
 }
 
 .stat-icon {
@@ -683,11 +709,11 @@ onMounted(() => {
 }
 
 .detail-header h2 {
-  font-size: 1.1rem;
+  font-size: 1.25rem;
   font-weight: 800;
-  color: #1e293b;
+  color: #0f172a;
   margin: 0;
-  text-transform: uppercase;
+  letter-spacing: -0.02em;
 }
 
 .detail-actions {
@@ -709,25 +735,25 @@ onMounted(() => {
 }
 
 .detail-search {
-  padding: 8px 12px 8px 35px;
-  border-radius: 8px;
+  padding: 10px 16px 10px 42px;
+  border-radius: 12px;
   border: 1px solid #e2e8f0;
   background: white;
-  font-size: 0.9rem;
-  width: 280px;
+  font-size: 0.95rem;
+  width: 320px;
   outline: none;
-  transition: all 0.2s;
+  transition: all 0.3s ease;
 }
 
 .detail-search:focus {
   border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
 }
 
 .filter-icon-btn {
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
   border: 1px solid #e2e8f0;
   background: white;
   color: #64748b;
@@ -735,15 +761,23 @@ onMounted(() => {
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.filter-icon-btn:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  color: #1e293b;
 }
 
 /* Premium Table */
 .table-card-wrapper {
   background: white;
-  border-radius: 12px;
+  border-radius: 16px;
   border: 1px solid #f1f5f9;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
   overflow: hidden;
+  margin-bottom: 40px;
 }
 
 .premium-table {
@@ -753,25 +787,30 @@ onMounted(() => {
 
 .premium-table th {
   background: #f8fafc;
-  padding: 15px 20px;
+  padding: 18px 24px;
   text-align: left;
   font-size: 0.75rem;
-  font-weight: 800;
-  color: #64748b;
+  font-weight: 700;
+  color: #475569;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  border-bottom: 2px solid #f1f5f9;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid #f1f5f9;
 }
 
 .premium-table td {
-  padding: 14px 20px;
-  font-size: 0.9rem;
+  padding: 16px 24px;
+  font-size: 0.95rem;
   border-bottom: 1px solid #f1f5f9;
-  color: #334155;
+  color: #1e293b;
+  vertical-align: middle;
+}
+
+.premium-table tr:nth-child(even) td {
+  background: #fcfcfd;
 }
 
 .premium-table tr:hover td {
-  background: #fdfdfd;
+  background: #f8fafc;
 }
 
 .mesa-badge {

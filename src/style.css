@@ -58,13 +58,19 @@ a:hover {
 
 body {
   margin: 0;
-  min-width: 320px;
-  min-height: 100vh;
+  width: 100vw;
+  height: 100vh;
   background: var(--bg-body);
   color: var(--text-primary);
-  overflow-x: hidden;
+  overflow: hidden; /* Lock viewport scroll */
   font-size: 14px;
   transition: background-color 0.3s ease, color 0.3s ease;
+  overscroll-behavior: none;
+}
+
+html {
+  overflow: hidden;
+  height: 100%;
 }
 
 /* Global Container Responsive Padding */
@@ -158,12 +164,9 @@ button:focus-visible {
 }
 
 #app {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 1rem;
-  /* Reduced padding */
+  width: 100%;
   min-height: 100vh;
-  padding-top: 0;
+  padding: 0;
   box-sizing: border-box;
 }
 

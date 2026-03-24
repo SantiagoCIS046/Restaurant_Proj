@@ -41,66 +41,70 @@
 
         <!-- Main Content -->
         <main class="content-area">
-          <div class="content-header">
-            <div class="header-info">
-              <h1 class="page-title">Gestión de Mesas</h1>
-              <p class="page-subtitle">Control de disponibilidad y asignación en tiempo real.</p>
+          <div class="sticky-header-wrapper">
+            <div class="content-header">
+              <div class="header-info">
+                <h1 class="page-title">Gestión de Mesas</h1>
+                <p class="page-subtitle">Control de disponibilidad y asignación en tiempo real.</p>
+              </div>
+              <div class="header-actions">
+                <button class="action-btn btn-add" @click="showAddModal = true">
+                  <i class="fas fa-plus"></i> AGREGAR
+                </button>
+                <button class="action-btn btn-reserve" @click="showSelectModal = true">
+                  <i class="fas fa-calendar-check"></i> RESERVAR
+                </button>
+                <button class="action-btn btn-reservations" @click="showReservationsModal = true">
+                  <i class="fas fa-book"></i> RESERVAS
+                  <span v-if="reservasActivas.length > 0" class="badge">{{ reservasActivas.length }}</span>
+                </button>
+              </div>
             </div>
-            <div class="header-actions">
-              <button class="action-btn btn-add" @click="showAddModal = true">
-                <i class="fas fa-plus"></i> AGREGAR
-              </button>
-              <button class="action-btn btn-reserve" @click="showSelectModal = true">
-                <i class="fas fa-calendar-check"></i> RESERVAR
-              </button>
-              <button class="action-btn btn-reservations" @click="showReservationsModal = true">
-                <i class="fas fa-book"></i> RESERVAS
-                <span v-if="reservasActivas.length > 0" class="badge">{{ reservasActivas.length }}</span>
-              </button>
+
+            <!-- Stats Bar -->
+            <div class="stats-bar">
+              <div class="stat-card disponible">
+                <div class="stat-content">
+                  <span class="stat-label">DISPONIBLE</span>
+                  <span class="stat-value">{{ countByState('disponible') }}</span>
+                </div>
+                <div class="stat-icon-wrapper">
+                  <i class="fas fa-check"></i>
+                </div>
+              </div>
+              <div class="stat-card reservada">
+                <div class="stat-content">
+                  <span class="stat-label">RESERVADA</span>
+                  <span class="stat-value">{{ countByState('reservada') }}</span>
+                </div>
+                <div class="stat-icon-wrapper">
+                  <i class="fas fa-bookmark"></i>
+                </div>
+              </div>
+              <div class="stat-card ocupada">
+                <div class="stat-content">
+                  <span class="stat-label">OCUPADA</span>
+                  <span class="stat-value">{{ countByState('ocupada') }}</span>
+                </div>
+                <div class="stat-icon-wrapper">
+                  <i class="fas fa-utensils"></i>
+                </div>
+              </div>
+              <div class="stat-card deshabilitada">
+                <div class="stat-content">
+                  <span class="stat-label">DESHABILITADA</span>
+                  <span class="stat-value">{{ countByState('deshabilitada') }}</span>
+                </div>
+                <div class="stat-icon-wrapper">
+                  <i class="fas fa-ban"></i>
+                </div>
+              </div>
             </div>
           </div>
 
-          <!-- Stats Bar -->
-          <div class="stats-bar">
-            <div class="stat-card disponible">
-              <div class="stat-content">
-                <span class="stat-label">DISPONIBLE</span>
-                <span class="stat-value">{{ countByState('disponible') }}</span>
-              </div>
-              <div class="stat-icon-wrapper">
-                <i class="fas fa-check"></i>
-              </div>
-            </div>
-            <div class="stat-card reservada">
-              <div class="stat-content">
-                <span class="stat-label">RESERVADA</span>
-                <span class="stat-value">{{ countByState('reservada') }}</span>
-              </div>
-              <div class="stat-icon-wrapper">
-                <i class="fas fa-bookmark"></i>
-              </div>
-            </div>
-            <div class="stat-card ocupada">
-              <div class="stat-content">
-                <span class="stat-label">OCUPADA</span>
-                <span class="stat-value">{{ countByState('ocupada') }}</span>
-              </div>
-              <div class="stat-icon-wrapper">
-                <i class="fas fa-utensils"></i>
-              </div>
-            </div>
-            <div class="stat-card deshabilitada">
-              <div class="stat-content">
-                <span class="stat-label">DESHABILITADA</span>
-                <span class="stat-value">{{ countByState('deshabilitada') }}</span>
-              </div>
-              <div class="stat-icon-wrapper">
-                <i class="fas fa-ban"></i>
-              </div>
-            </div>
-          </div>
-
-          <div class="table-grid">
+          <!-- Table Grid Container (Only this scrolls) -->
+          <div class="table-grid-container">
+            <div class="table-grid">
             <div
               v-for="mesa in filteredAndSearchedMesas"
               :key="mesa.id"
@@ -148,6 +152,7 @@
                   </button>
                 </div>
               </div>
+            </div>
             </div>
           </div>
         </main>
@@ -927,31 +932,43 @@ onMounted(() => {
 @import "../style.css";
 
 .container {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 1rem;
-  padding-top: 114px;
-  min-height: calc(100vh - 56px);
+  width: 100%;
+  padding: 0 1.5rem 0 0;
+  padding-top: 102px; /* 98px navbar + 4px breathing room */
+  height: 100vh;
+  overflow: hidden;
+}
+
+.mesas-view,
+.mostrador-view {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 .main-layout {
   display: flex;
+  flex: 1;
   gap: 2rem;
-  align-items: flex-start;
+  align-items: stretch;
+  min-height: 0;
 }
 
 /* Sidebar Styling */
 .sidebar {
-  width: 220px;
+  width: 240px;
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
-  position: fixed;
-  top: 114px;
-  bottom: 1.5rem;
+  gap: 1rem;
+  position: sticky;
+  top: 0;
+  height: 100%;
   overflow-y: auto;
-  padding-right: 0.5rem;
+  padding: 0.75rem 1rem 1.5rem 1.5rem;
+  border-right: 1px solid #e2e8f0;
+  background: #fbfcfd;
 }
 
 /* Custom scrollbar for sidebar */
@@ -1067,8 +1084,16 @@ onMounted(() => {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-  margin-left: 240px;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.sticky-header-wrapper {
+  background: var(--bg-body);
+  z-index: 100;
+  padding: 0.75rem 1rem 1rem 0rem;
+  margin-left: 2rem;
+  flex-shrink: 0;
 }
 
 .content-header {
@@ -1076,11 +1101,8 @@ onMounted(() => {
   justify-content: space-between;
   align-items: flex-start;
   gap: 2rem;
-  position: sticky;
-  top: 114px;
-  background: #f8fafc;
-  z-index: 10;
-  padding: 0.25rem 0 0.75rem 0;
+  background: transparent;
+  padding-bottom: 0.75rem;
 }
 
 .page-title {
@@ -1171,12 +1193,9 @@ onMounted(() => {
 .stats-bar {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 1.25rem;
-  position: sticky;
-  top: 175px; /* Adjusted to sit below content-header */
-  background: #f8fafc;
-  z-index: 9;
-  padding-bottom: 0.75rem;
+  gap: 1rem;
+  background: transparent;
+  padding-bottom: 0.5rem;
 }
 
 .stat-card {
@@ -1277,17 +1296,19 @@ onMounted(() => {
 /* Grid & Cards */
 .table-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 1.5rem;
+  padding-bottom: 3rem;
+  width: 100%;
 }
 
 .table-card {
   background: white;
   border-radius: 12px;
-  padding: 0.8rem;
+  padding: 1rem;
   display: flex;
   flex-direction: column;
-  gap: 0.8rem;
+  gap: 1rem;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
   border: 1px solid #f1f5f9;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -1325,10 +1346,10 @@ onMounted(() => {
 }
 
 .status-badge {
-  font-size: 0.65rem;
+  font-size: 0.7rem;
   font-weight: 800;
-  padding: 0.25rem 0.6rem;
-  border-radius: 6px;
+  padding: 0.35rem 0.8rem;
+  border-radius: 8px;
   letter-spacing: 0.05em;
 }
 
@@ -1340,7 +1361,7 @@ onMounted(() => {
 .card-body {
   display: flex;
   flex-direction: column;
-  gap: 0.6rem;
+  gap: 0.8rem;
 }
 
 .info-row {
@@ -1443,8 +1464,28 @@ onMounted(() => {
   .header-actions { flex-direction: row; flex-wrap: wrap; }
 }
 
-@media (max-width: 480px) {
-  .stats-bar { grid-template-columns: 1fr; }
-  .table-grid { grid-template-columns: 1fr; }
+.table-grid-container {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 2rem 2rem 2rem;
+  /* Smooth scrolling */
+  scroll-behavior: smooth;
+  /* Prevent scroll chaining and viewport bounce */
+  overscroll-behavior: contain;
 }
+
+/* Custom scrollbar for table grid */
+.table-grid-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.table-grid-container::-webkit-scrollbar-thumb {
+  background: #e2e8f0;
+  border-radius: 10px;
+}
+
+.table-grid-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
 </style>
