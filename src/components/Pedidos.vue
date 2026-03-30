@@ -41,10 +41,6 @@
     <!-- Main Content Area -->
     <main class="pedidos-main" :class="{ 'full-width': vistaCliente }">
       <!-- Client View Toggle (Visible in Client View) -->
-      <button v-if="vistaCliente" @click="toggleView" class="client-view-toggle glass-effect">
-        <i class="fas fa-user-shield"></i>
-        <span>Panel Administrativo</span>
-      </button>
 
       <!-- Content Header (Admin Only) -->
       <header v-if="!vistaCliente" class="content-header glass-effect">
@@ -92,6 +88,10 @@
               <i class="fas fa-search"></i>
               <input v-model="searchQuery" type="text" placeholder="Buscar en el menú...">
             </div>
+            <button v-if="vistaCliente" @click="toggleView" class="client-view-toggle">
+              <i class="fas fa-user-shield"></i>
+              <span>Panel Administrativo</span>
+            </button>
           </div>
 
           <div class="cliente-layout-premium">
@@ -403,11 +403,11 @@
                 <div class="panel-header">
                   <h3>Categorías Materiales</h3>
                 </div>
-                <div class="item-grid-compact">
+                <div class="item-grid">
                   <button
                     v-for="category in materialCategories"
                     :key="category"
-                    class="grid-item-card"
+                    class="grid-item-compact"
                     :class="{ active: selectedMaterialCategory === category }"
                     @click="selectedMaterialCategory = category"
                   >
@@ -471,11 +471,11 @@
                 <div class="panel-header">
                   <h3>Bodega Central</h3>
                 </div>
-                <div class="item-grid-compact">
+                <div class="item-grid">
                   <button
                     v-for="category in inventoryCategories"
                     :key="category"
-                    class="grid-item-card"
+                    class="grid-item-compact"
                     :class="{ active: selectedInventoryCategory === category }"
                     @click="selectedInventoryCategory = category"
                   >
@@ -1366,52 +1366,297 @@ onMounted(() => {
 .status-badge.pendiente { background: #fef3c7; color: #92400e; }
 .status-badge.servido { background: #d1fae5; color: #065f46; }
 
-/* --- Vista Cliente --- */
-.vista-cliente-wrapper {
-  background: #f8fafc;
-  min-height: 100%;
+.pedidos-main.full-width {
+  overflow: hidden !important;
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 56px);
 }
 
+.vista-cliente-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: #f8fafc;
+}
+
+.cliente-layout-premium {
+  display: grid;
+  grid-template-columns: 1fr 350px;
+  gap: 20px;
+  padding: 20px 40px;
+  align-items: start;
+  max-width: 1600px;
+  margin: 0 auto;
+  flex: 1;
+  overflow: hidden;
+}
+
+.products-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  overflow-y: auto !important;
+  height: 100%;
+  padding-bottom: 40px;
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
+}
+
+.products-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.products-container::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
+}
+
+/* --- Vista Cliente --- */
 .cliente-hero {
-  padding: 40px;
+  padding: 20px 40px;
   background: white;
   border-bottom: 1px solid var(--border-color);
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 20px; /* Added gap for elements on the right */
+}
+
+.hero-badge {
+  background: #ecfdf5;
+  color: #10b981;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-weight: 700;
+  font-size: 0.75rem;
+  letter-spacing: 0.5px;
+}
+
+.hero-content h1 {
+  font-size: 1.8rem;
+  font-weight: 800;
+  margin: 5px 0;
+}
+
+.text-gradient {
+  background: linear-gradient(135deg, #10b981, #3b82f6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.search-bar-premium {
+  position: relative;
+}
+
+.search-bar-premium i {
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94a3b8;
+  font-size: 0.9rem;
 }
 
 .search-bar-premium input {
-  width: 350px;
-  padding: 14px 20px 14px 50px;
+  width: 300px;
+  padding: 12px 15px 12px 45px;
   background: #f1f5f9;
   border: 1px solid var(--border-color);
-  border-radius: 30px;
+  border-radius: 12px;
   color: var(--text-primary);
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+}
+
+.search-bar-premium input:focus {
+  outline: none;
+  background: white;
+  border-color: var(--accent-color);
+}
+
+.cliente-layout-premium {
+  display: grid;
+  grid-template-columns: 1fr 350px;
+  gap: 20px;
+  padding: 20px 40px;
+  align-items: start;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+/* --- Responsividad Móvil --- */
+@media (max-width: 1100px) {
+  .cliente-layout-premium {
+    grid-template-columns: 1fr;
+  }
+  
+  .cart-panel-premium {
+    position: static;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .cliente-hero {
+    flex-direction: column;
+    gap: 30px;
+    text-align: center;
+  }
+
+  .search-bar-premium input {
+    width: 100%;
+    max-width: 500px;
+  }
+}
+
+@media (max-width: 640px) {
+  .premium-products-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .cliente-hero {
+    padding: 30px 20px;
+  }
+
+  .hero-content h1 {
+    font-size: 1.8rem;
+  }
+}
+
+.products-container {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.premium-products-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+}
+
+@media (max-width: 900px) {
+  .premium-products-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .premium-products-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .product-card-premium {
   background: white;
-  border-radius: 20px;
+  border-radius: 16px;
   border: 1px solid var(--border-color);
-  box-shadow: var(--shadow-sm);
-  transition: all 0.3s;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  height: 100%;
 }
 
 .product-card-premium:hover {
-  transform: translateY(-5px);
-  box-shadow: var(--shadow-lg);
+  transform: translateY(-4px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
   border-color: var(--accent-color);
 }
 
+.product-image-placeholder {
+  height: 120px;
+  background: #f8fafc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  color: #cbd5e1;
+}
+
+.product-info-premium {
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.product-header {
+  margin-bottom: 8px;
+}
+
+.product-header h3 {
+  font-size: 0.95rem;
+  font-weight: 800;
+  margin: 0;
+}
+
+.price-tag {
+  background: #ecfdf5;
+  color: #059669;
+  padding: 3px 8px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.product-desc {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  margin-bottom: 10px;
+  flex: 1;
+}
+
+.product-footer-premium {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #f1f5f9;
+}
+
+.add-to-cart-btn {
+  padding: 12px;
+  border-radius: 12px;
+  font-size: 0.9rem;
+}
+
 .cart-panel-premium {
-  background: white;
-  border-radius: 20px;
-  border: 1px solid var(--border-color);
-  padding: 25px;
-  box-shadow: var(--shadow-lg);
-  position: sticky;
-  top: 20px;
+  padding: 24px;
+  top: 80px;
+}
+
+/* --- Corrección de Botón y Contraste --- */
+.client-view-toggle {
+  background: #ffffff !important;
+  color: #1e293b !important;
+  padding: 12px 28px;
+  border-radius: 50px;
+  font-weight: 800;
+  font-size: 0.85rem;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05), 0 0 20px rgba(16, 185, 129, 0.15);
+  white-space: nowrap;
+}
+
+.client-view-toggle i {
+  color: #10b981;
+  font-size: 1.1rem;
+}
+
+.client-view-toggle:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08), 0 0 30px rgba(16, 185, 129, 0.25);
+  border-color: #10b981;
 }
 
 .checkout-btn {
@@ -1428,27 +1673,75 @@ onMounted(() => {
 
 /* Modal Styling */
 .modal-overlay {
-  background: rgba(15, 23, 42, 0.4);
-  backdrop-filter: blur(4px);
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 20px;
 }
 
-.glass-modal {
-  background: white;
+.glass-modal, .pedido-modal {
+  background: var(--white);
+  padding: 40px;
+  border-radius: 28px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
   border: 1px solid var(--border-color);
-  border-radius: 24px;
-  box-shadow: var(--shadow-lg);
+  max-width: 600px;
+  width: 100%;
+  animation: modalScaleUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
+}
+
+@keyframes modalScaleUp {
+  from { opacity: 0; transform: scale(0.9) translateY(20px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.modal-brand {
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+.modal-brand i {
+  font-size: 2.2rem;
+  color: var(--accent-color);
+  margin-bottom: 8px;
+}
+
+.modal-brand h2 {
+  font-size: 1.4rem;
+  font-weight: 800;
+  margin: 0;
+  letter-spacing: 0.5px;
 }
 
 .premium-input, .premium-select {
-  background: #f8fafc;
+  width: 100%;
+  padding: 14px 18px;
+  border-radius: 12px;
   border: 1px solid var(--border-color);
-  color: var(--text-primary);
-  border-radius: 10px;
+  background: #f8fafc;
+  font-family: inherit;
+  font-size: 0.95rem;
+  margin-bottom: 12px;
+  transition: all 0.2s;
+  box-sizing: border-box;
+}
+
+.premium-input:focus, .premium-select:focus {
+  outline: none;
+  border-color: var(--accent-color);
+  background: white;
+  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
 }
 
 /* Animations */
 .animate-fade-in { animation: fadeIn 0.4s ease-out; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
 
 @media (max-width: 1200px) {
   .pedidos-sidebar { width: 80px; padding: 20px 10px; }

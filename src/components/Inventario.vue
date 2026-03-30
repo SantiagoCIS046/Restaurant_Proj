@@ -1,411 +1,285 @@
 <template>
   <div class="inventario-container">
-<!-- Barra de botones para navegar entre secciones del inventario -->
-    <div class="button-bar">
-      <button @click="currentSection = 'productos'">Productos</button>
-      <button @click="currentSection = 'ingredientes'">Ingredientes</button>
-      <button @click="currentSection = 'stock'">Stock</button>
-      <button @click="currentSection = 'reportes'">Reportes</button>
-    </div>
+    <!-- Modern Inventory Navbar -->
+    <nav class="inventory-navbar">
+      <div class="navbar-tabs">
+        <button 
+          v-for="tab in ['productos', 'ingredientes', 'stock', 'reportes']" 
+          :key="tab"
+          class="tab-btn"
+          :class="{ active: currentSection === tab }"
+          @click="currentSection = tab"
+        >
+          {{ tab.toUpperCase() }}
+        </button>
+      </div>
+    </nav>
 
-    <!-- Contenido de la sección de productos -->
-    <div v-if="currentSection === 'productos'" class="productos-page">
-      <div class="left-side">
-        <div class="header-row">
-          <h1 class="title">Categorías de Productos</h1>
-          <div class="header-buttons">
-            <button
-              class="add-category-btn"
-              @click="toggleAddCategoryForm('productos')"
-            >
-              ➕ Agregar Categoría
-            </button>
-            <button
-              class="delete-category-btn"
-              @click="toggleDeleteCategoryForm('productos')"
-            >
-              🗑️ Eliminar Categoría
-            </button>
-          </div>
+    <!-- Header Section with Actions (Example for Productos) -->
+    <header class="inventory-header" v-if="currentSection === 'productos'">
+      <div class="header-content">
+        <h1 class="header-title">Categorías de Productos</h1>
+        <div class="header-actions">
+          <button @click="toggleAddCategoryForm('productos')" class="btn-action-green">
+            <i class="fas fa-plus-circle"></i> Agregar Categoría
+          </button>
+          <button @click="toggleDeleteCategoryForm('productos')" class="btn-action-red">
+            <i class="fas fa-trash-alt"></i> Eliminar Categoría
+          </button>
         </div>
-        <div class="category-list">
-          <button
-            v-for="category in productCategories"
-            :key="category"
-            class="category-btn"
-            :class="{ active: selectedProductCategory === category }"
-            @click="selectProductCategory(category)"
-          >
-            {{ category }}
+        <div class="header-actions-right">
+          <button @click="toggleAddProductForm" class="btn-action-blue">
+            <i class="fas fa-file-invoice"></i> Agregar Producto
           </button>
         </div>
       </div>
+    </header>
 
-      <div class="right-side" @wheel.prevent>
-        <button class="add-btn" @click="toggleAddProductForm">
-          Agregar Producto
-        </button>
-        <div v-if="selectedProductCategory" class="item-list">
-          <h2>{{ selectedProductCategory }}</h2>
-          <ul>
-            <li
+    <!-- Header Section for Ingredientes -->
+    <header class="inventory-header" v-if="currentSection === 'ingredientes'">
+      <div class="header-content">
+        <h1 class="header-title">Categorías de Ingredientes</h1>
+        <div class="header-actions">
+          <button @click="toggleAddCategoryForm('ingredientes')" class="btn-action-green">
+            <i class="fas fa-plus-circle"></i> Agregar Categoría
+          </button>
+          <button @click="toggleDeleteCategoryForm('ingredientes')" class="btn-action-red">
+            <i class="fas fa-trash-alt"></i> Eliminar Categoría
+          </button>
+        </div>
+        <div class="header-actions-right">
+          <button @click="toggleAddIngredientForm" class="btn-action-blue">
+            <i class="fas fa-carrot"></i> Agregar Ingrediente
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Header Section for Stock -->
+    <header class="inventory-header" v-if="currentSection === 'stock'">
+      <div class="header-content">
+        <h1 class="header-title">Gestión de Stock</h1>
+      </div>
+    </header>
+
+    <!-- Header Section for Reportes -->
+    <header class="inventory-header" v-if="currentSection === 'reportes'">
+      <div class="header-content">
+        <h1 class="header-title">Reportes e Inteligencia</h1>
+        <div class="header-actions">
+          <button @click="generateReport" class="btn-action-blue">
+            <i class="fas fa-chart-bar"></i> Generar Reporte General
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content Layout (Productos) -->
+    <div v-if="currentSection === 'productos'" class="inventory-main-content animate-fade-in">
+      <aside class="inventory-sidebar">
+        <div class="sidebar-nav">
+          <button 
+            v-for="cat in productCategories" 
+            :key="cat"
+            class="sidebar-nav-item"
+            :class="{ active: selectedProductCategory === cat }"
+            @click="selectProductCategory(cat)"
+          >
+            {{ cat }}
+          </button>
+        </div>
+      </aside>
+
+      <section class="inventory-view-area">
+        <div v-if="!selectedProductCategory" class="empty-state-placeholder">
+          <div class="empty-placeholder-content">
+            <div class="placeholder-icon">
+              <i class="fas fa-box-open"></i>
+            </div>
+            <h2>Seleccione una categoría para gestionar sus productos</h2>
+            <p>Espacio de trabajo optimizado para Epicure Pro</p>
+          </div>
+        </div>
+        <div v-else class="item-list">
+          <div class="view-header">
+            <h2>{{ selectedProductCategory }}</h2>
+          </div>
+          <div class="items-grid">
+            <div
               v-for="(item, index) in products[selectedProductCategory]"
               :key="item.name"
-              class="item-row"
+              class="item-card-modern"
             >
-              <span class="item-name">{{ index + 1 }}. {{ item.name }}</span>
-              <div class="item-actions">
-                <button
-                  @click="editProduct(index)"
-                  class="edit-btn"
-                  title="Editar"
-                >
-                  <i class="fas fa-edit"></i>
-                </button>
-                <button
-                  @click="deleteProduct(index)"
-                  class="delete-btn"
-                  title="Eliminar"
-                >
-                  <i class="fas fa-trash"></i>
-                </button>
+              <div class="item-card-inner">
+                <span class="item-name">{{ item.name }}</span>
+                <div class="item-actions">
+                  <button @click="editProduct(index)" class="btn-mini-edit"><i class="fas fa-edit"></i></button>
+                  <button @click="deleteProduct(index)" class="btn-mini-delete"><i class="fas fa-trash"></i></button>
+                </div>
               </div>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </div>
-
-    <!-- Contenido de la sección de ingredientes -->
-    <div v-else-if="currentSection === 'ingredientes'" class="productos-page">
-      <div class="left-side">
-        <div class="header-row">
-          <h1 class="title">Categorías de Ingredientes</h1>
-          <div class="header-buttons">
-            <button
-              class="add-category-btn"
-              @click="toggleAddCategoryForm('ingredientes')"
-            >
-              ➕ Agregar Categoría
-            </button>
-            <button
-              class="delete-category-btn"
-              @click="toggleDeleteCategoryForm('ingredientes')"
-            >
-              🗑️ Eliminar Categoría
-            </button>
+            </div>
           </div>
         </div>
-        <div class="category-list">
-          <button
-            v-for="category in ingredientCategories"
-            :key="category"
-            class="category-btn"
-            :class="{ active: selectedIngredientCategory === category }"
-            @click="selectIngredientCategory(category)"
+      </section>
+    </div>
+
+    <!-- Similar Layout for Ingredientes -->
+    <div v-else-if="currentSection === 'ingredientes'" class="inventory-main-content animate-fade-in">
+      <aside class="inventory-sidebar">
+        <div class="sidebar-nav">
+          <button 
+            v-for="cat in ingredientCategories" 
+            :key="cat"
+            class="sidebar-nav-item"
+            :class="{ active: selectedIngredientCategory === cat }"
+            @click="selectIngredientCategory(cat)"
           >
-            {{ category }} ({{ ingredients[category].length }})
+            {{ cat }}
           </button>
         </div>
-      </div>
-      <div class="right-side" @wheel.prevent>
-        <button class="add-btn" @click="toggleAddIngredientForm">
-          Agregar Ingrediente
-        </button>
-        <div v-if="selectedIngredientCategory" class="item-list">
-          <h2>{{ selectedIngredientCategory }}</h2>
-          <ul>
-            <li
+      </aside>
+
+      <section class="inventory-view-area">
+        <div v-if="!selectedIngredientCategory" class="empty-state-placeholder">
+          <div class="empty-placeholder-content">
+            <div class="placeholder-icon">
+              <i class="fas fa-leaf"></i>
+            </div>
+            <h2>Seleccione una categoría para gestionar sus ingredientes</h2>
+            <p>Espacio de trabajo optimizado para Epicure Pro</p>
+          </div>
+        </div>
+        <div v-else class="item-list">
+          <div class="view-header">
+            <h2>{{ selectedIngredientCategory }}</h2>
+          </div>
+          <div class="items-grid">
+            <div
               v-for="(item, index) in ingredients[selectedIngredientCategory]"
               :key="item.name"
-              class="item-row"
+              class="item-card-modern"
             >
-              <span class="item-name">{{ index + 1 }}. {{ item.name }}</span>
-              <div class="item-actions">
-                <button
-                  @click="editIngredient(index)"
-                  class="edit-btn"
-                  title="Editar"
-                >
-                  <i class="fas fa-edit"></i>
-                </button>
-                <button
-                  @click="deleteIngredient(index)"
-                  class="delete-btn"
-                  title="Eliminar"
-                >
-                  <i class="fas fa-trash"></i>
-                </button>
+              <div class="item-card-inner">
+                <span class="item-name">{{ item.name }}</span>
+                <div class="item-actions">
+                  <button @click="editIngredient(index)" class="btn-mini-edit"><i class="fas fa-edit"></i></button>
+                  <button @click="deleteIngredient(index)" class="btn-mini-delete"><i class="fas fa-trash"></i></button>
+                </div>
               </div>
-            </li>
-          </ul>
+            </div>
+          </div>
         </div>
-      </div>
+      </section>
     </div>
 
     <!-- Contenido de la sección de stock -->
-    <div v-else-if="currentSection === 'stock'" class="productos-page">
-      <div class="left-side">
-        <h1 class="title">Categorías de Stock</h1>
-        <div class="stock-categories">
-          <div class="category-section">
-            <h3 class="section-title">Productos</h3>
-            <div class="category-list">
-              <button
-                v-for="category in productCategories"
-                :key="category"
-                class="category-btn"
-                :class="{ active: selectedStockProductCategory === category }"
-                @click="selectStockProductCategory(category)"
-              >
-                {{ category }} ({{ products[category].length }})
-              </button>
-            </div>
+    <div v-else-if="currentSection === 'stock'" class="inventory-main-content animate-fade-in">
+      <aside class="inventory-sidebar">
+        <div class="sidebar-nav">
+          <div class="nav-group">
+            <h3 class="nav-group-title">PRODUCTOS</h3>
+            <button 
+              v-for="cat in productCategories" 
+              :key="cat"
+              class="sidebar-nav-item"
+              :class="{ active: selectedStockProductCategory === cat }"
+              @click="selectStockProductCategory(cat)"
+            >
+              {{ cat }}
+            </button>
           </div>
-          <div class="category-section">
-            <h3 class="section-title">Ingredientes</h3>
-            <div class="category-list">
-              <button
-                v-for="category in ingredientCategories"
-                :key="category"
-                class="category-btn"
-                :class="{
-                  active: selectedStockIngredientCategory === category,
-                }"
-                @click="selectStockIngredientCategory(category)"
-              >
-                {{ category }} ({{ ingredients[category].length }})
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="right-side" @wheel.prevent>
-        <div v-if="selectedStockProductCategory" class="item-list">
-          <h2>{{ selectedStockProductCategory }} (Productos)</h2>
-          <table class="quantity-table">
-            <thead>
-              <tr>
-                <th>Producto</th>
-                <th>Cantidad</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr
-                v-for="(item, index) in products[selectedStockProductCategory]"
-                :key="item.name"
-              >
-                <td>{{ index + 1 }}. {{ item.name }}</td>
-                <td>{{ item.quantity }}</td>
-                <td>
-                  <button
-                    @click="editStockProduct(index)"
-                    class="edit-btn"
-                    title="Editar Cantidad"
-                  >
-                    <i class="fas fa-edit"></i>
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <div v-else-if="selectedStockIngredientCategory" class="item-list">
-          <h2>{{ selectedStockIngredientCategory }} (Ingredientes)</h2>
-          <table class="quantity-table">
-            <thead>
-              <tr>
-                <th>Ingrediente</th>
-                <th>Cantidad</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr
-                v-for="(item, index) in ingredients[
-                  selectedStockIngredientCategory
-                ]"
-                :key="item.name"
-              >
-                <td>{{ index + 1 }}. {{ item.name }}</td>
-                <td>{{ item.quantity }}</td>
-                <td>
-                  <button
-                    @click="editStockIngredient(index)"
-                    class="edit-btn"
-                    title="Editar Cantidad"
-                  >
-                    <i class="fas fa-edit"></i>
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <div v-else class="stock-welcome">
-          <h2>Bienvenido a la sección de Stock</h2>
-          <p>
-            Selecciona una categoría de productos o ingredientes del lado
-            izquierdo para ver las cantidades disponibles.
-          </p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Contenido de la sección de reportes -->
-    <div v-else-if="currentSection === 'reportes'" class="productos-page">
-      <div class="left-side">
-        <div
-          v-if="lowStockAlerts.length > 0"
-          class="alert-notification"
-          @click="showAlerts = !showAlerts"
-        >
-          Alertas de Stock Bajo: {{ lowStockAlerts.length }} (Haz clic para ver)
-        </div>
-        <h1 class="title">Reportes de Inventario</h1>
-        <div class="category-list">
-          <button class="category-btn active" @click="generateReport">
-            Generar Reporte General
-          </button>
-          <button class="category-btn" @click="showProductsReport">
-            📊 Reporte de Productos
-          </button>
-          <button class="category-btn" @click="showIngredientsReport">
-            📊 Reporte de Ingredientes
-          </button>
-          <button class="category-btn" @click="showLowStockReport">
-            📊 Reporte de Stock Bajo
-          </button>
-          <button class="category-btn" @click="showCategoriesReport">
-            📊 Reporte de Categorías
-          </button>
-          <button class="category-btn" @click="showInventoryValueReport">
-            💰 Reporte de Valor de Inventario
-          </button>
-          <button class="category-btn" @click="showMovementReport">
-            📈 Reporte de Movimientos
-          </button>
-          <button class="category-btn" @click="showSupplierReport">
-            🏢 Reporte de Proveedores
-          </button>
-          <button class="category-btn" @click="showExpirationReport">
-            ⏰ Reporte de Vencimientos
-          </button>
-          <button class="category-btn" @click="alertStock">
-            ⚠️ Alertar ({{ lowStockAlerts.length }})
-          </button>
-          <button class="category-btn" @click="exportReport">
-            📄 Exportar Reporte
-          </button>
-        </div>
-      </div>
-      <div class="right-side">
-        <div class="report-content">
-          <div class="report-header">
-            <h2>Reporte de Inventario</h2>
-            <p class="report-description">
-              Información general del estado actual del inventario
-            </p>
-          </div>
-
-          <div class="report-stats">
-            <div class="stat-card" @click="showProductsModal = true">
-              <div class="stat-icon">
-                <i class="fas fa-boxes"></i>
-              </div>
-              <div class="stat-info">
-                <div class="stat-number">{{ totalProducts }}</div>
-                <div class="stat-label">Total Productos</div>
-              </div>
-            </div>
-
-            <div class="stat-card" @click="showIngredientsModal = true">
-              <div class="stat-icon">
-                <i class="fas fa-leaf"></i>
-              </div>
-              <div class="stat-info">
-                <div class="stat-number">{{ totalIngredients }}</div>
-                <div class="stat-label">Total Ingredientes</div>
-              </div>
-            </div>
-
-            <div class="stat-card warning" @click="showLowStockModal = true">
-              <div class="stat-icon">
-                <i class="fas fa-exclamation-triangle"></i>
-              </div>
-              <div class="stat-info">
-                <div class="stat-number">{{ lowStockProducts }}</div>
-                <div class="stat-label">Stock Bajo</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="report-details">
-            <div class="detail-section">
-              <h4>Productos por Categoría</h4>
-              <ul class="category-summary">
-                <li
-                  v-for="(count, category) in productCategoryCounts"
-                  :key="category"
-                >
-                  {{ category }}: {{ count }} productos
-                </li>
-              </ul>
-            </div>
-            <div class="detail-section">
-              <h4>Ingredientes por Categoría</h4>
-              <ul class="category-summary">
-                <li
-                  v-for="(count, category) in ingredientCategoryCounts"
-                  :key="category"
-                >
-                  {{ category }}: {{ count }} ingredientes
-                </li>
-              </ul>
-            </div>
-          </div>
-          
-          <div class="report-actions">
-            <button class="generate-report-btn" @click="generateReport">
-              <i class="fas fa-chart-bar"></i>
-              Generar Reporte Detallado
+          <div class="nav-group" style="margin-top: 20px;">
+            <h3 class="nav-group-title">INGREDIENTES</h3>
+            <button 
+              v-for="cat in ingredientCategories" 
+              :key="cat"
+              class="sidebar-nav-item"
+              :class="{ active: selectedStockIngredientCategory === cat }"
+              @click="selectStockIngredientCategory(cat)"
+            >
+              {{ cat }}
             </button>
           </div>
         </div>
-        <div v-if="showAlerts" class="alerts-display">
-          <div class="alerts-header">
-            <h3>Alertas de Stock Bajo</h3>
-            <span class="alerts-count">{{ lowStockAlerts.length }} items</span>
+      </aside>
+
+      <section class="inventory-view-area">
+        <div v-if="!selectedStockProductCategory && !selectedStockIngredientCategory" class="empty-state-placeholder">
+          <div class="empty-placeholder-content">
+            <div class="placeholder-icon">
+              <i class="fas fa-layer-group"></i>
+            </div>
+            <h2>Seleccione una categoría para ver el stock</h2>
           </div>
-          <div class="alerts-list">
-            <div
-              v-for="alert in lowStockAlerts"
-              :key="alert.name"
-              class="alert-card"
-              :class="{
-                'low-stock': alert.quantity < 5,
-                'medium-stock': alert.quantity >= 5 && alert.quantity < 10,
-              }"
-            >
-              <div class="alert-info">
-                <div class="alert-name">{{ alert.name }}</div>
-                <div class="alert-type">{{ alert.type }}</div>
-              </div>
-              <div class="alert-quantity">
-                <span class="quantity-value">{{ alert.quantity }}</span>
-                <span class="quantity-unit">unidades</span>
-              </div>
-              <div class="alert-status">
-                <span v-if="alert.quantity < 5" class="status-critical"
-                  >Crítico</span
-                >
-                <span v-else class="status-warning">Bajo</span>
-              </div>
+        </div>
+        <div v-else class="item-list">
+          <div class="view-header">
+            <h2>Stock: {{ selectedStockProductCategory || selectedStockIngredientCategory }}</h2>
+          </div>
+          <table class="quantity-table">
+            <thead>
+              <tr>
+                <th>Item</th>
+                <th>Stock Actual</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(item, index) in (selectedStockProductCategory ? products[selectedStockProductCategory] : ingredients[selectedStockIngredientCategory])" :key="item.name">
+                <td>{{ item.name }}</td>
+                <td><span class="quantity-badge-modern">{{ item.quantity }} units</span></td>
+                <td>
+                  <button v-if="selectedStockProductCategory" @click="editStockProduct(index)" class="btn-mini-edit"><i class="fas fa-edit"></i></button>
+                  <button v-else @click="editStockIngredient(index)" class="btn-mini-edit"><i class="fas fa-edit"></i></button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+
+    <!-- Contenido de la sección de reportes -->
+    <div v-else-if="currentSection === 'reportes'" class="inventory-main-content animate-fade-in">
+      <aside class="inventory-sidebar">
+        <div class="sidebar-nav">
+          <button class="sidebar-nav-item" @click="showProductsModal = true">
+            PRODUCTOS COMPLETOS
+          </button>
+          <button class="sidebar-nav-item" @click="showIngredientsModal = true">
+            INGREDIENTES COMPLETOS
+          </button>
+          <button class="sidebar-nav-item" @click="showLowStockModal = true">
+            ALERTAS CRÍTICAS
+          </button>
+        </div>
+      </aside>
+
+      <section class="inventory-view-area">
+        <div class="report-stats">
+          <div class="stat-card" @click="showProductsModal = true">
+            <div class="stat-icon"><i class="fas fa-boxes"></i></div>
+            <div class="stat-info">
+              <span class="stat-number">{{ totalProducts }}</span>
+              <span class="stat-label">Productos</span>
+            </div>
+          </div>
+          <div class="stat-card" @click="showIngredientsModal = true">
+            <div class="stat-icon"><i class="fas fa-leaf"></i></div>
+            <div class="stat-info">
+              <span class="stat-number">{{ totalIngredients }}</span>
+              <span class="stat-label">Ingredientes</span>
+            </div>
+          </div>
+          <div class="stat-card" :class="{ 'warning': lowStockProducts > 0 }" @click="showLowStockModal = true">
+            <div class="stat-icon"><i class="fas fa-exclamation-triangle"></i></div>
+            <div class="stat-info">
+              <span class="stat-number">{{ lowStockProducts }}</span>
+              <span class="stat-label">Stock Bajo</span>
             </div>
           </div>
         </div>
-      </div>
+      </section>
     </div>
 
     <!-- Modal para agregar producto -->
@@ -1899,6 +1773,17 @@ import { ref, computed, watch } from "vue";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 
+// Helper to get icons for tabs
+const getTabIcon = (tab) => {
+  const icons = {
+    productos: 'fas fa-box',
+    ingredientes: 'fas fa-leaf',
+    stock: 'fas fa-cubes',
+    reportes: 'fas fa-chart-bar'
+  };
+  return icons[tab] || 'fas fa-circle';
+};
+
 const currentSection = ref("productos");
 const productCategories = ref([
   "Bebidas",
@@ -3307,1991 +3192,501 @@ const exportReport = () => {
 </script>
 
 <style scoped>
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+  --primary-emerald: #56cf44;
+  --primary-blue: #0061f2;
+  --primary-red: #e53e3e;
+  --bg-light: #f8fafc;
+  --text-dark: #1e293b;
+  --text-grey: #64748b;
+  --border-light: #e2e8f0;
+  --white: #ffffff;
+}
+
 .inventario-container {
-  position: relative;
-  padding-top: 100px; /* Ajuste para la navbar fija */
-  overflow: hidden;
-}
-
-.button-bar {
-  display: flex;
-  justify-content: flex-start;
-  gap: 1rem;
-  margin-bottom: 1rem;
-  padding: 0.5rem;
-  background: rgba(26, 46, 82, 0.733);
-  border-radius: 1px;
-  position: fixed;
-  top: 48px; /* Adjust based on navbar height */
-  left: 0;
-  width: 100%;
-  z-index: 999;
-  pointer-events: auto;
-}
-
-.button-bar button {
-  background: #3182ce;
-  border: none;
-  color: white;
-  font-size: 0.8rem;
-  font-weight: 500;
-  padding: 0.3rem 0.3rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  border-radius: 6px;
-  text-transform: uppercase;
-  letter-spacing: 0.1px;
-  white-space: nowrap;
-}
-
-.button-bar button:hover {
-  background: #2c5282;
-  transform: translateY(-1px);
-}
-
-.button-bar button:focus {
-  outline: 2px solid #3182ce;
-  outline-offset: 2px;
-  transition: outline 0.1s ease;
-}
-
-.productos-page {
-  display: flex;
-  position: fixed;
-  top: 100px; /* Adjust based on navbar height */
-  left: 0;
-  width: 100%;
-  height: calc(100vh - 100px);
-  overflow: hidden;
-}
-
-.left-side {
-  flex: 0 0 30%;
-  padding: 1rem;
-  background: #dedede7b;
-  border-right: 1px solid #e2e8f0;
-  border-radius: 10px 0 0 10px;
-  overflow-y: auto;
-}
-
-.title {
-  font-size: 1.5rem;
-  margin-bottom: 1rem;
-  color: #2d3748;
-}
-
-.category-list {
+  font-family: 'Outfit', sans-serif;
+  background-color: var(--white);
+  height: 100vh;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-}
-
-.category-btn {
-  background: #edf2f7;
-  border: 1px solid #cbd5e0;
-  color: #4a5568;
-  padding: 0.3rem 0.5rem;
-  cursor: pointer;
-  border-radius: 4px;
-  text-align: left;
-  transition: all 0.2s ease;
-  max-width: 180px;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
-.category-btn:hover {
-  background: #e2e8f0;
+/* --- Navbar Tabs --- */
+.inventory-navbar {
+  padding: 15px 40px;
+  border-bottom: 1px solid var(--border-light);
 }
 
-.category-btn.active {
-  background: #3182ce;
-  color: white;
-  border-color: #2c5282;
+.navbar-tabs {
+  display: flex;
+  gap: 12px;
 }
 
-.right-side {
-  flex: 1;
-  padding: 1rem;
-  background: #ffffff;
-  overflow-y: auto;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
+.tab-btn {
+  padding: 8px 24px;
+  border-radius: 10px;
+  border: 1px solid var(--border-light);
+  background: var(--white);
+  color: var(--text-grey);
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s;
 }
 
-.add-btn {
-  background: #38a169;
+.tab-btn:hover {
+  background: #f1f5f9;
+}
+
+.tab-btn.active {
+  background: #f1f5f9;
+  color: var(--text-dark);
+  border-color: #cbd5e0;
+}
+
+/* --- Header Section --- */
+.inventory-header {
+  padding: 20px 40px;
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.header-title {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--text-dark);
+  margin-right: auto;
+}
+
+.header-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.header-actions-right {
+  margin-left: auto;
+}
+
+/* Button Styles */
+.btn-action-green, .btn-action-red, .btn-action-blue {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 12px;
   border: none;
   color: white;
-  padding: 0.5rem 1rem;
-  font-size: 0.8rem;
+  font-weight: 700;
+  font-size: 0.95rem;
   cursor: pointer;
-  border-radius: 4px;
-  margin-bottom: 1rem;
-  transition: background 0.2s ease;
+  transition: all 0.2s;
 }
 
-.add-btn:hover {
-  background: #2f855a;
+.btn-action-green { background: var(--primary-emerald); }
+.btn-action-red { background: var(--primary-red); }
+.btn-action-blue { background: var(--primary-blue); }
+
+.btn-action-green:hover, .btn-action-red:hover, .btn-action-blue:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-.item-list h2 {
-  margin-bottom: 0.5rem;
-  color: #2d3748;
+/* --- Main Layout --- */
+.inventory-main-content {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  flex: 1;
+  background: #f8fafc;
+  border-top: 1px solid var(--border-light);
+  overflow: hidden;
 }
 
-.item-list ul {
-  list-style: none;
-  padding: 0;
+/* --- Sidebar --- */
+.inventory-sidebar {
+  padding: 24px;
+  background: #f8fafc;
+  border-right: 1px solid var(--border-light);
+  overflow-y: auto;
+  height: 100%;
 }
 
-.item-list li {
-  padding: 0.25rem 0;
-  border-bottom: 1px solid #e2e8f0;
-}
-
-.item-row {
+.sidebar-nav {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sidebar-nav-item {
+  width: 100%;
+  padding: 16px 20px;
+  background: var(--white);
+  border: 1px solid var(--border-light);
+  border-radius: 12px;
+  text-align: left;
+  font-weight: 700;
+  color: var(--text-dark);
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.sidebar-nav-item:hover {
+  border-color: var(--primary-blue);
+  transform: translateX(4px);
+}
+
+.sidebar-nav-item.active {
+  border-color: var(--primary-blue);
+  background: #f0f7ff;
+  color: var(--primary-blue);
+}
+
+/* --- View Area --- */
+.inventory-view-area {
+  padding: 40px;
+  background: var(--white);
+  overflow-y: auto;
+  height: 100%;
+}
+
+.empty-state-placeholder {
+  height: 100%;
+  display: flex;
   align-items: center;
-  padding: 0.5rem 0;
+  justify-content: center;
+  border: 2px dashed var(--border-light);
+  border-radius: 20px;
+}
+
+.empty-placeholder-content {
+  text-align: center;
+  color: #94a3b8;
+}
+
+.placeholder-icon {
+  font-size: 4rem;
+  margin-bottom: 20px;
+  opacity: 0.5;
+}
+
+.empty-placeholder-content h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-grey);
+}
+
+/* --- Items List & Grid --- */
+.item-list h2 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin-bottom: 24px;
+}
+
+.items-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+}
+
+.item-card-modern {
+  background: var(--white);
+  border: 1px solid var(--border-light);
+  border-radius: 16px;
+  padding: 20px;
+  transition: all 0.2s;
+}
+
+.item-card-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .item-name {
-  flex: 1;
+  font-weight: 700;
+  font-size: 1.1rem;
 }
 
 .item-actions {
   display: flex;
+  gap: 8px;
+}
+
+.btn-mini-edit, .btn-mini-delete {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  display: flex;
   align-items: center;
-  gap: 0.5rem;
+  justify-content: center;
 }
 
-.edit-btn {
-  background: #3182ce;
-  border: none;
-  color: white;
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background 0.2s ease;
+.btn-mini-edit { background: #f1f5f9; color: var(--text-grey); }
+.btn-mini-delete { background: #fef2f2; color: var(--primary-red); }
+
+.animate-fade-in { animation: fadeIn 0.4s ease-out; }
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-.edit-btn:hover {
-  background: #2c5282;
-}
+/* Custom Scrollbar for Sidebar */
+.inventory-sidebar::-webkit-scrollbar { width: 6px; }
+.inventory-sidebar::-webkit-scrollbar-thumb { background: #cbd5e0; border-radius: 10px; }
 
-.delete-btn {
-  background: #ce3131;
-  height: 28px;
-  border: none;
-  color: white;
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background 0.2s ease;
-}
-
-.delete-btn:hover {
-  background: #c53030;
-}
-
-.quantity-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 1rem;
-}
-
-.quantity-table th,
-.quantity-table td {
-  padding: 0.5rem;
-  text-align: left;
-  border-bottom: 1px solid #e2e8f0;
-}
-
-.quantity-table th {
-  background: #f7fafc;
-  font-weight: bold;
-  color: #2d3748;
-}
-
-.report-content {
-  padding: 1rem;
-}
-
-.report-header {
-  text-align: center;
-  margin-bottom: 2rem;
-}
-
-.report-header h2 {
-  margin-bottom: 0.5rem;
-  color: #2d3748;
-  font-size: 1.75rem;
-  font-weight: 700;
-}
-
-.report-description {
-  color: #718096;
-  font-size: 1rem;
-  line-height: 1.5;
-}
-
+/* --- Report Styles --- */
 .report-stats {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1rem;
-  margin-bottom: 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 24px;
+  margin-top: 20px;
 }
 
 .stat-card {
-  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-  color: white;
-  padding: 1.5rem;
-  border-radius: 12px;
-  text-align: center;
-  box-shadow: 0 4px 12px rgba(245, 87, 108, 0.3);
-  transition: transform 0.2s ease;
+  background: var(--white);
+  padding: 30px;
+  border-radius: 20px;
+  border: 1px solid var(--border-light);
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
 }
 
 .stat-card:hover {
-  transform: translateY(-4px);
-}
-
-.stat-card.warning {
-  background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
-  color: #d69e2e;
-  box-shadow: 0 4px 12px rgba(252, 182, 159, 0.3);
+  transform: translateY(-5px);
+  border-color: var(--primary-blue);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
 }
 
 .stat-icon {
-  font-size: 2rem;
-  margin-bottom: 0.5rem;
-  opacity: 0.9;
+  width: 64px;
+  height: 64px;
+  border-radius: 18px;
+  background: #f1f5f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+  color: var(--primary-blue);
+  transition: all 0.3s;
+}
+
+.stat-card:hover .stat-icon {
+  background: var(--primary-blue);
+  color: white;
+  transform: scale(1.1) rotate(-5deg);
+}
+
+.stat-card.warning .stat-icon {
+  color: var(--primary-red);
+  background: #fff1f2;
+}
+
+.stat-card.warning:hover .stat-icon {
+  background: var(--primary-red);
+  color: white;
 }
 
 .stat-info {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
 }
 
 .stat-number {
-  font-size: 2rem;
-  font-weight: 700;
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: var(--text-dark);
+  line-height: 1;
 }
 
 .stat-label {
-  font-size: 0.875rem;
-  opacity: 0.9;
-  font-weight: 500;
-}
-
-.report-actions {
-  display: flex;
-  justify-content: center;
-  margin-top: 2rem;
-}
-
-.generate-report-btn {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
-  cursor: pointer;
+  font-size: 0.95rem;
   font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  transition: all 0.2s ease;
-  font-size: 1rem;
+  color: var(--text-grey);
+  margin-top: 4px;
 }
 
-.generate-report-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-}
-
-/* Modal styles */
+/* --- Modal Improvements --- */
 .modal-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
+  inset: 0;
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(8px);
   display: flex;
-  justify-content: center;
   align-items: center;
-  z-index: 1000;
+  justify-content: center;
+  z-index: 2000;
+  padding: 20px;
 }
 
-.modal-content {
-  background: white;
-  padding: 1.5rem;
-  border-radius: 8px;
-  width: 300px;
-  max-width: 90%;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.modal-content h3 {
-  margin-top: 0;
-  margin-bottom: 1rem;
-  color: #2d3748;
-}
-
-.modal-content select,
-.modal-content input {
+.modal-content, .report-modal-content, .alerts-modal-content {
+  background: var(--white);
+  padding: 40px;
+  border-radius: 28px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  border: 1px solid var(--border-light);
+  max-width: 550px;
   width: 100%;
-  padding: 0.5rem;
-  border: 1px solid #cbd5e0;
-  border-radius: 4px;
-  margin-bottom: 1rem;
+  animation: modalScaleUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
+}
+
+@keyframes modalScaleUp {
+  from { opacity: 0; transform: scale(0.9) translateY(20px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.modal-content h3, .report-modal-content h3, .alerts-modal-content h3 {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--text-dark);
+  margin-bottom: 24px;
+  letter-spacing: -0.02em;
+}
+
+.modal-content input, .modal-content select {
+  width: 100%;
+  padding: 16px 20px;
+  border-radius: 14px;
+  border: 1px solid var(--border-light);
+  background: #f8fafc;
+  font-family: inherit;
+  font-size: 1rem;
+  margin-bottom: 20px;
+  transition: all 0.2s;
   box-sizing: border-box;
+}
+
+.modal-content input:focus, .modal-content select:focus {
+  outline: none;
+  border-color: var(--primary-blue);
+  background: white;
+  box-shadow: 0 0 0 4px rgba(0, 97, 242, 0.1);
 }
 
 .modal-buttons {
   display: flex;
-  gap: 0.5rem;
-  justify-content: flex-end;
+  gap: 16px;
+  margin-top: 24px;
 }
 
 .modal-buttons button {
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 4px;
+  flex: 1;
+  padding: 16px;
+  border-radius: 14px;
+  font-weight: 700;
+  font-size: 1rem;
   cursor: pointer;
-  transition: background 0.2s ease;
+  transition: all 0.2s;
 }
 
 .modal-buttons button:first-child {
-  background: #3182ce;
+  background: var(--primary-blue);
   color: white;
-}
-
-.modal-buttons button:first-child:hover {
-  background: #2c5282;
+  border: none;
 }
 
 .modal-buttons button:last-child {
-  background: #e53e3e;
-  color: white;
+  background: #f1f5f9;
+  color: var(--text-grey);
+  border: 1px solid var(--border-light);
 }
 
-.modal-buttons button:last-child:hover {
-  background: #c53030;
-}
-
-.header-buttons {
-  display: grid;
-  grid-template-columns: repeat(2, auto);
-  gap: 0.5rem;
-  align-items: center;
-  margin-right: -0.5rem;
-  margin-left: auto;
-  margin-top: -0.5rem;
-}
-
-.header-buttons button {
-  padding: 0.65rem 0.5rem;
-  font-size: 0.875rem;
-  white-space: nowrap;
-}
-.add-category-btn {
-  background-color: #56cf44;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-  padding: 0.35rem 0.5rem;
-  font-size: 0.875rem;
-  white-space: nowrap;
-}
-.add-category-btn:hover {
-  background-color: #239e0ec6;
-}
-.delete-category-btn {
-  background-color: #e53e3e;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-  padding: 0.35rem 0.5rem;
-  font-size: 0.875rem;
-  white-space: nowrap;
-}
-.delete-category-btn:hover {
-  background-color: #c53030c6;
-}
-.header-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
-}
-
-.alerts-section {
-  margin-bottom: 1rem;
-  padding: 1rem;
-  background: #fef5e7;
-  border: 1px solid #f6e05e;
-  border-radius: 4px;
-}
-
-.alerts-section h3 {
-  margin-top: 0;
-  margin-bottom: 0.5rem;
-  color: #d69e2e;
-}
-
-.alerts-section ul {
-  list-style: none;
-  padding: 0;
-}
-
-.alerts-section li {
-  padding: 0.25rem 0;
-  color: #744210;
-}
-
-.alert-notification {
-  background: #e53e3e;
-  color: white;
-  padding: 0.5rem;
-  border-radius: 4px;
-  margin-bottom: 1rem;
-  font-weight: bold;
-  text-align: center;
-  cursor: pointer;
-  transition: background 0.2s ease;
-}
-
-.alert-notification:hover {
-  background: #c53030;
-}
-
-.alerts-display {
-  margin-top: 1rem;
-  padding: 1.5rem;
-  background: linear-gradient(135deg, #fef5e7 0%, #fff8e1 100%);
-  border: 2px solid #f6e05e;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(246, 224, 94, 0.2);
-}
-
-.alerts-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
-  padding-bottom: 0.75rem;
-  border-bottom: 2px solid #f6e05e;
-}
-
-.alerts-header h3 {
-  margin: 0;
-  color: #d69e2e;
-  font-size: 1.25rem;
-  font-weight: 600;
-}
-
-.alerts-count {
-  background: #e53e3e;
-  color: white;
-  padding: 0.25rem 0.75rem;
-  border-radius: 20px;
-  font-size: 0.875rem;
-  font-weight: 600;
-  box-shadow: 0 2px 4px rgba(229, 62, 62, 0.3);
-}
-
-.alerts-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.alert-card {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem;
-  background: white;
-  border-radius: 8px;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  transition: all 0.2s ease;
-}
-
-.alert-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.alert-card.low-stock {
-  border-left: 4px solid #e53e3e;
-  background: linear-gradient(90deg, #fef2f2 0%, white 20%);
-}
-
-.alert-card.medium-stock {
-  border-left: 4px solid #dd6b20;
-  background: linear-gradient(90deg, #fef5e7 0%, white 20%);
-}
-
-.alert-info {
-  flex: 1;
-}
-
-.alert-name {
-  font-weight: 600;
-  color: #2d3748;
-  margin-bottom: 0.25rem;
-  font-size: 1rem;
-}
-
-.alert-type {
-  font-size: 0.875rem;
-  color: #718096;
-  font-weight: 500;
-}
-
-.alert-quantity {
-  text-align: center;
-  margin-right: 1rem;
-}
-
-.quantity-value {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: #2d3748;
-}
-
-.quantity-unit {
-  font-size: 0.75rem;
-  color: #a0aec0;
-  display: block;
-  margin-top: 0.125rem;
-}
-
-.alert-status {
-  text-align: right;
-}
-
-.status-critical {
-  background: #e53e3e;
-  color: white;
-  padding: 0.25rem 0.75rem;
-  border-radius: 12px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.status-warning {
-  background: #dd6b20;
-  color: white;
-  padding: 0.25rem 0.75rem;
-  border-radius: 12px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.stock-categories {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.category-section {
-  margin-bottom: 1rem;
-}
-
-.section-title {
-  font-size: 1.2rem;
-  font-weight: bold;
-  color: #2d3748;
-  margin-bottom: 0.5rem;
-  border-bottom: 2px solid #3182ce;
-  padding-bottom: 0.25rem;
-}
-
-.large-modal {
-  width: 500px;
-  max-height: 80vh;
-  overflow-y: auto;
-}
-
-.update-list {
-  margin-top: 1rem;
-  max-height: 300px;
-  overflow-y: auto;
-}
-
-.update-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.5rem 0;
-  border-bottom: 1px solid #e2e8f0;
-}
-
-.update-name {
-  flex: 1;
-  font-weight: bold;
-}
-
-.update-input {
-  width: 80px;
-  padding: 0.25rem;
-  border: 1px solid #cbd5e0;
-  border-radius: 4px;
-  text-align: center;
-}
-
-.stock-welcome {
-  text-align: center;
-  padding: 2rem;
-  color: #4a5568;
-}
-
-.stock-welcome h2 {
-  margin-bottom: 1rem;
-  color: #2d3748;
-}
-
-.stock-welcome p {
-  font-size: 1rem;
-  line-height: 1.5;
-}
-
-.alerts-modal-content {
-  background: white;
-  padding: 2rem;
-  border-radius: 16px;
-  width: 500px;
-  max-width: 90%;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-  max-height: 80vh;
-  overflow-y: auto;
-}
-
-.alerts-modal-header {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-  padding-bottom: 1rem;
-  border-bottom: 2px solid #e2e8f0;
-}
-
-.alerts-modal-icon {
-  background: linear-gradient(135deg, #fef5e7 0%, #fff8e1 100%);
-  border: 2px solid #f6e05e;
-  border-radius: 50%;
-  width: 60px;
-  height: 60px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #d69e2e;
-  font-size: 1.5rem;
-}
-
-.alerts-modal-title h3 {
-  margin: 0 0 0.25rem 0;
-  color: #2d3748;
-  font-size: 1.5rem;
-  font-weight: 600;
-}
-
-.alerts-modal-subtitle {
-  margin: 0;
-  color: #718096;
-  font-size: 0.875rem;
-}
-
-.alerts-modal-body {
-  margin-bottom: 2rem;
-}
-
-.alerts-modal-description {
-  margin: 0 0 1.5rem 0;
-  color: #4a5568;
-  font-size: 1rem;
-  line-height: 1.5;
-}
-
+/* --- Alerts Modal Specifics --- */
 .alerts-modal-options {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
+  display: grid;
+  gap: 16px;
+  margin-top: 24px;
 }
 
 .alert-option {
+  padding: 20px;
+  background: #f8fafc;
+  border: 1px solid var(--border-light);
+  border-radius: 18px;
   display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 1.25rem;
-  background: #f7fafc;
-  border: 2px solid #e2e8f0;
-  border-radius: 12px;
+  gap: 16px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.2s;
 }
 
 .alert-option:hover {
-  background: #edf2f7;
-  border-color: #cbd5e0;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  background: white;
+  border-color: var(--primary-blue);
+  transform: translateX(6px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
 }
 
 .option-icon {
-  background: #3182ce;
-  color: white;
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: #f1f5f9;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1rem;
-  flex-shrink: 0;
-}
-
-.option-content h4 {
-  margin: 0 0 0.25rem 0;
-  color: #2d3748;
-  font-size: 1.1rem;
-  font-weight: 600;
-}
-
-.option-content p {
-  margin: 0;
-  color: #718096;
-  font-size: 0.875rem;
-  line-height: 1.4;
-}
-
-.alerts-modal-footer {
-  display: flex;
-  justify-content: flex-end;
-  padding-top: 1.5rem;
-  border-top: 1px solid #e2e8f0;
-}
-
-.report-modal-content {
-  background: white;
-  padding: 2rem;
-  border-radius: 16px;
-  width: 800px;
-  max-width: 95%;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-  max-height: 90vh;
-  overflow-y: auto;
-}
-
-.report-modal-header {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 2rem;
-  padding-bottom: 1.5rem;
-  border-bottom: 2px solid #e2e8f0;
-}
-
-.report-modal-icon {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 50%;
-  width: 60px;
-  height: 60px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-size: 1.5rem;
-}
-
-.report-modal-title h3 {
-  margin: 0 0 0.25rem 0;
-  color: #2d3748;
-  font-size: 1.75rem;
-  font-weight: 700;
-}
-
-.report-modal-subtitle {
-  margin: 0;
-  color: #718096;
-  font-size: 0.875rem;
-}
-
-.report-modal-body {
-  margin-bottom: 2rem;
-}
-
-.report-summary {
-  margin-bottom: 2rem;
-}
-
-.summary-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1rem;
-  margin-bottom: 2rem;
-}
-
-.summary-card {
-  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-  color: white;
-  padding: 1.5rem;
-  border-radius: 12px;
-  text-align: center;
-  box-shadow: 0 4px 12px rgba(245, 87, 108, 0.3);
-  transition: transform 0.2s ease;
-}
-
-.summary-card:hover {
-  transform: translateY(-4px);
-}
-
-.summary-card.warning {
-  background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
-  color: #d69e2e;
-  box-shadow: 0 4px 12px rgba(252, 182, 159, 0.3);
-}
-
-.summary-icon {
-  font-size: 2rem;
-  margin-bottom: 0.5rem;
-  opacity: 0.9;
-}
-
-.summary-content h4 {
-  margin: 0 0 0.25rem 0;
-  font-size: 2rem;
-  font-weight: 700;
-}
-
-.summary-content p {
-  margin: 0;
-  font-size: 0.875rem;
-  opacity: 0.9;
-  font-weight: 500;
-}
-
-.report-sections {
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
-}
-
-.report-section {
-  background: #f8fafc;
-  padding: 1.5rem;
-  border-radius: 12px;
-  border: 1px solid #e2e8f0;
-}
-
-.report-section h4 {
-  margin: 0 0 1rem 0;
-  color: #2d3748;
+  color: var(--primary-blue);
   font-size: 1.25rem;
-  font-weight: 600;
-  border-bottom: 2px solid #3182ce;
-  padding-bottom: 0.5rem;
 }
 
-.category-breakdown {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
+/* --- Table Refinement --- */
+.quantity-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 10px;
+  margin-top: 10px;
 }
 
-.category-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem;
-  background: white;
-  border-radius: 8px;
-  border: 1px solid #e2e8f0;
-  transition: all 0.2s ease;
-}
-
-.category-item:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.category-info {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
-.category-name {
-  font-weight: 600;
-  color: #2d3748;
-  font-size: 1rem;
-}
-
-.category-count {
-  font-size: 0.875rem;
-  color: #718096;
-}
-
-.category-stats {
-  text-align: right;
-}
-
-.low-stock-count {
-  background: #fed7d7;
-  color: #e53e3e;
-  padding: 0.25rem 0.5rem;
-  border-radius: 12px;
-  font-size: 0.75rem;
-  font-weight: 600;
-}
-
-.low-stock-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.low-stock-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.75rem;
-  background: white;
-  border-radius: 8px;
-  border: 1px solid #e2e8f0;
-  transition: all 0.2s ease;
-}
-
-.low-stock-item:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.low-stock-item.critical {
-  border-left: 4px solid #e53e3e;
-  background: linear-gradient(90deg, #fef2f2 0%, white 20%);
-}
-
-.item-info {
-  display: flex;
-  flex-direction: column;
-  gap: 0.125rem;
-}
-
-.item-name {
-  font-weight: 600;
-  color: #2d3748;
-  font-size: 0.875rem;
-}
-
-.item-type {
-  font-size: 0.75rem;
-  color: #718096;
-  font-weight: 500;
-}
-
-.item-quantity {
-  text-align: right;
-}
-
-.quantity {
-  font-size: 1.25rem;
+.quantity-table th {
+  text-align: left;
+  padding: 0 24px 10px;
+  color: var(--text-grey);
   font-weight: 700;
-  color: #2d3748;
-}
-
-.unit {
-  font-size: 0.75rem;
-  color: #a0aec0;
-}
-
-.report-modal-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding-top: 2rem;
-  border-top: 2px solid #e2e8f0;
-}
-
-.export-btn {
-  background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-  color: white;
-  border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  transition: all 0.2s ease;
-}
-
-.export-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(72, 187, 120, 0.4);
-}
-
-.close-btn {
-  background: #e2e8f0;
-  color: #4a5568;
-  border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  transition: all 0.2s ease;
-}
-
-.close-btn:hover {
-  background: #cbd5e0;
-  transform: translateY(-2px);
-}
-
-.products-list {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.category-section-modal {
-  margin-bottom: 1.5rem;
-}
-
-.category-title-modal {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: #2d3748;
-  margin-bottom: 0.75rem;
-  border-bottom: 2px solid #3182ce;
-  padding-bottom: 0.25rem;
-}
-
-.items-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 0.75rem;
-}
-
-.item-card {
-  background: white;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  padding: 1rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  transition: transform 0.2s ease;
-}
-
-.item-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.item-card.low-stock {
-  border-left: 4px solid #e53e3e;
-  background: linear-gradient(90deg, #fef2f2 0%, white 20%);
-}
-
-.item-name {
-  font-weight: 600;
-  color: #2d3748;
-  margin-bottom: 0.5rem;
-  font-size: 1rem;
-}
-
-.item-quantity {
-  font-size: 0.875rem;
-  color: #718096;
-}
-
-.ingredients-list {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.low-stock-modal-list {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.alert-card-modal {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem;
-  background: white;
-  border-radius: 8px;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  transition: all 0.2s ease;
-}
-
-.alert-card-modal:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.alert-card-modal.critical {
-  border-left: 4px solid #e53e3e;
-  background: linear-gradient(90deg, #fef2f2 0%, white 20%);
-}
-
-.alert-card-modal.warning {
-  border-left: 4px solid #dd6b20;
-  background: linear-gradient(90deg, #fef5e7 0%, white 20%);
-}
-
-.alert-info-modal {
-  flex: 1;
-}
-
-.alert-name-modal {
-  font-weight: 600;
-  color: #2d3748;
-  margin-bottom: 0.25rem;
-  font-size: 1rem;
-}
-
-.alert-type-modal {
-  font-size: 0.875rem;
-  color: #718096;
-  font-weight: 500;
-}
-
-.alert-quantity-modal {
-  text-align: center;
-  margin-right: 1rem;
-}
-
-.quantity-value-modal {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: #2d3748;
-}
-
-.quantity-unit-modal {
-  font-size: 0.75rem;
-  color: #a0aec0;
-  display: block;
-  margin-top: 0.125rem;
-}
-
-.alert-status-modal {
-  text-align: right;
-}
-
-.status-critical-modal {
-  background: #e53e3e;
-  color: white;
-  padding: 0.25rem 0.75rem;
-  border-radius: 12px;
-  font-size: 0.75rem;
-  font-weight: 600;
+  font-size: 0.85rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
 
-.status-warning-modal {
-  background: #dd6b20;
-  color: white;
-  padding: 0.25rem 0.75rem;
-  border-radius: 12px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.update-btn {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  transition: all 0.2s ease;
-}
-
-.update-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-}
-
-.stats-overview {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.stat-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem;
-  background: white;
-  border-radius: 8px;
-  border: 1px solid #e2e8f0;
-  transition: all 0.2s ease;
-}
-
-.stat-item:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.stat-label {
-  font-weight: 600;
-  color: #2d3748;
-  font-size: 0.875rem;
-}
-
-.stat-value {
-  font-weight: 700;
-  color: #3182ce;
-  font-size: 1rem;
-}
-
-/* Styles for new report modals */
-.category-value {
-  font-weight: 600;
-  color: #38a169;
-  font-size: 0.875rem;
-}
-
-.movements-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.movement-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem;
-  background: white;
-  border-radius: 8px;
-  border: 1px solid #e2e8f0;
-  transition: all 0.2s ease;
-}
-
-.movement-item:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.movement-item.entry {
-  border-left: 4px solid #38a169;
-  background: linear-gradient(90deg, #f0fff4 0%, white 20%);
-}
-
-.movement-item.exit {
-  border-left: 4px solid #e53e3e;
-  background: linear-gradient(90deg, #fef2f2 0%, white 20%);
-}
-
-.movement-info {
-  flex: 1;
-}
-
-.movement-date {
-  font-weight: 600;
-  color: #2d3748;
-  font-size: 0.875rem;
-  margin-bottom: 0.25rem;
-}
-
-.movement-details {
-  display: flex;
-  gap: 0.5rem;
-  align-items: center;
-}
-
-.movement-item-name {
-  font-weight: 500;
-  color: #4a5568;
-}
-
-.movement-category {
-  font-size: 0.75rem;
-  color: #718096;
-  font-style: italic;
-}
-
-.movement-quantity {
-  text-align: right;
-}
-
-.quantity-badge {
-  padding: 0.25rem 0.5rem;
-  border-radius: 12px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.quantity-badge.entry {
-  background: #38a169;
-  color: white;
-}
-
-.quantity-badge.exit {
-  background: #e53e3e;
-  color: white;
-}
-
-.movement-reason {
-  text-align: right;
-  max-width: 150px;
-}
-
-.reason-text {
-  font-size: 0.75rem;
-  color: #718096;
-  font-style: italic;
-}
-
-.suppliers-list {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.supplier-item {
-  padding: 1.5rem;
-  background: white;
-  border-radius: 12px;
-  border: 1px solid #e2e8f0;
-  transition: all 0.2s ease;
-}
-
-.supplier-item:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-.supplier-info {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
-}
-
-.supplier-name {
-  font-weight: 600;
-  color: #2d3748;
-  font-size: 1.1rem;
-}
-
-.supplier-contact {
-  font-size: 0.875rem;
-  color: #718096;
-}
-
-.supplier-products {
-  margin-bottom: 1rem;
-}
-
-.products-label {
-  font-weight: 600;
-  color: #2d3748;
-  font-size: 0.875rem;
-  margin-bottom: 0.5rem;
-}
-
-.products-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-}
-
-.product-tag {
-  background: #edf2f7;
-  color: #4a5568;
-  padding: 0.25rem 0.5rem;
-  border-radius: 12px;
-  font-size: 0.75rem;
-  font-weight: 500;
-}
-
-.supplier-last-order {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.last-order-label {
-  font-weight: 600;
-  color: #2d3748;
-  font-size: 0.875rem;
-}
-
-.last-order-date {
-  font-size: 0.875rem;
-  color: #38a169;
-  font-weight: 500;
-}
-
-.expiring-items-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.expiring-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem;
-  background: white;
-  border-radius: 8px;
-  border: 1px solid #e2e8f0;
-  transition: all 0.2s ease;
-}
-
-.expiring-item:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.expiring-item.critical {
-  border-left: 4px solid #e53e3e;
-  background: linear-gradient(90deg, #fef2f2 0%, white 20%);
-}
-
-.expiring-item.warning {
-  border-left: 4px solid #dd6b20;
-  background: linear-gradient(90deg, #fef5e7 0%, white 20%);
-}
-
-.item-info {
-  flex: 1;
-}
-
-.item-name {
-  font-weight: 600;
-  color: #2d3748;
-  margin-bottom: 0.25rem;
-  font-size: 1rem;
-}
-
-.item-category {
-  font-size: 0.875rem;
-  color: #718096;
-  font-weight: 500;
-}
-
-.item-quantity {
-  text-align: center;
-  margin-right: 1rem;
-}
-
-.quantity {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: #2d3748;
-}
-
-.unit {
-  font-size: 0.75rem;
-  color: #a0aec0;
-}
-
-.expiration-info {
-  text-align: right;
-}
-
-.expiration-date {
-  font-weight: 600;
-  color: #2d3748;
-  font-size: 0.875rem;
-  margin-bottom: 0.25rem;
-}
-
-.days-remaining {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.days-badge {
-  padding: 0.25rem 0.5rem;
-  border-radius: 12px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.days-badge.critical {
-  background: #e53e3e;
-  color: white;
-}
-
-.days-badge.warning {
-  background: #dd6b20;
-  color: white;
-}
-
-.stock-report-content {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.stock-section {
-  background: white;
-  padding: 1rem;
-  border-radius: 8px;
-  border: 1px solid #e2e8f0;
-}
-
-.stock-section h5 {
-  margin: 0 0 0.75rem 0;
-  color: #2d3748;
-  font-size: 1rem;
-  font-weight: 600;
-  border-bottom: 2px solid #3182ce;
-  padding-bottom: 0.25rem;
-}
-
-.stock-items {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.stock-category {
-  margin-bottom: 1rem;
-}
-
-.stock-category h6 {
-  margin: 0 0 0.5rem 0;
-  color: #4a5568;
-  font-size: 0.9rem;
-  font-weight: 600;
-}
-
-.stock-items-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
-.stock-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.5rem;
+.quantity-table td {
+  padding: 20px 24px;
   background: #f8fafc;
-  border-radius: 4px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border-light);
+  border-style: solid none;
 }
 
-.stock-item.low-stock {
-  border-left: 3px solid #e53e3e;
-  background: linear-gradient(90deg, #fef2f2 0%, #f8fafc 20%);
-}
-
-.stock-item-name {
-  font-weight: 500;
-  color: #2d3748;
-  font-size: 0.85rem;
-}
-
-.stock-item-quantity {
-  font-size: 0.8rem;
-  color: #718096;
-  font-weight: 500;
-}
-
-.categories-report-content {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.categories-section {
-  background: white;
-  padding: 1rem;
-  border-radius: 8px;
-  border: 1px solid #e2e8f0;
-}
-
-.categories-section h5 {
-  margin: 0 0 0.75rem 0;
-  color: #2d3748;
-  font-size: 1rem;
-  font-weight: 600;
-  border-bottom: 2px solid #3182ce;
-  padding-bottom: 0.25rem;
-}
-
-.categories-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.category-stat {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.75rem;
-  background: #f8fafc;
-  border-radius: 6px;
-  border: 1px solid #e2e8f0;
-}
-
-.category-stat .category-name {
-  font-weight: 600;
-  color: #2d3748;
-  font-size: 0.9rem;
-}
-
-.category-stat .category-count {
-  font-size: 0.85rem;
-  color: #718096;
-  font-weight: 500;
-}
-
-.largest-category {
-  margin-top: 0.75rem;
-  padding: 0.75rem;
-  background: #edf2f7;
-  border-radius: 6px;
-  font-size: 0.85rem;
-  color: #4a5568;
-}
-
-.value-report-content {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.value-summary {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1rem;
-}
-
-.value-item {
-  background: white;
-  padding: 1rem;
-  border-radius: 8px;
-  border: 1px solid #e2e8f0;
-  text-align: center;
-}
-
-.value-item .value-label {
-  font-weight: 600;
-  color: #2d3748;
-  font-size: 0.9rem;
-  margin-bottom: 0.5rem;
-}
-
-.value-item .value-amount {
-  font-size: 1.2rem;
+.quantity-table tr td:first-child {
+  border-left: 1px solid var(--border-light);
+  border-radius: 16px 0 0 16px;
   font-weight: 700;
-  color: #38a169;
 }
 
-.value-breakdown {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
+.quantity-table tr td:last-child {
+  border-right: 1px solid var(--border-light);
+  border-radius: 0 16px 16px 0;
 }
 
-.value-section {
-  background: white;
-  padding: 1rem;
-  border-radius: 8px;
-  border: 1px solid #e2e8f0;
-}
-
-.value-section h5 {
-  margin: 0 0 0.75rem 0;
-  color: #2d3748;
-  font-size: 1rem;
-  font-weight: 600;
-  border-bottom: 2px solid #3182ce;
-  padding-bottom: 0.25rem;
-}
-
-.value-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.value-category {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.75rem;
-  background: #f8fafc;
-  border-radius: 6px;
-  border: 1px solid #e2e8f0;
-}
-
-.value-category-name {
-  font-weight: 600;
-  color: #2d3748;
-  font-size: 0.9rem;
-}
-
-.value-category-amount {
-  font-size: 0.85rem;
-  color: #38a169;
-  font-weight: 600;
-}
-
-.movements-report-content {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.movements-summary {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 1rem;
-}
-
-.movement-stat {
-  background: white;
-  padding: 1rem;
-  border-radius: 8px;
-  border: 1px solid #e2e8f0;
-  text-align: center;
-}
-
-.movement-stat .stat-label {
-  font-weight: 600;
-  color: #2d3748;
-  font-size: 0.9rem;
-  margin-bottom: 0.5rem;
-}
-
-.movement-stat .stat-value {
-  font-size: 1.2rem;
+.quantity-badge-modern {
+  background: #e0f2fe;
+  color: #0369a1;
+  padding: 8px 16px;
+  border-radius: 20px;
   font-weight: 700;
-  color: #3182ce;
-}
-
-.movements-list {
-  background: white;
-  padding: 1rem;
-  border-radius: 8px;
-  border: 1px solid #e2e8f0;
-}
-
-.movements-list h5 {
-  margin: 0 0 0.75rem 0;
-  color: #2d3748;
-  font-size: 1rem;
-  font-weight: 600;
-  border-bottom: 2px solid #3182ce;
-  padding-bottom: 0.25rem;
-}
-
-.movements-items {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.suppliers-report-content {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.suppliers-summary {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 1rem;
-}
-
-.supplier-stat {
-  background: white;
-  padding: 1rem;
-  border-radius: 8px;
-  border: 1px solid #e2e8f0;
-  text-align: center;
-}
-
-.supplier-stat .stat-label {
-  font-weight: 600;
-  color: #2d3748;
   font-size: 0.9rem;
-  margin-bottom: 0.5rem;
 }
 
-.supplier-stat .stat-value {
-  font-size: 1.2rem;
-  font-weight: 700;
-  color: #3182ce;
-}
-
-.suppliers-list {
-  background: white;
-  padding: 1rem;
-  border-radius: 8px;
-  border: 1px solid #e2e8f0;
-}
-
-.suppliers-list h5 {
-  margin: 0 0 0.75rem 0;
-  color: #2d3748;
-  font-size: 1rem;
-  font-weight: 600;
-  border-bottom: 2px solid #3182ce;
-  padding-bottom: 0.25rem;
-}
-
-.suppliers-items {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.expirations-report-content {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.expirations-summary {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 1rem;
-}
-
-.expiration-stat {
-  background: white;
-  padding: 1rem;
-  border-radius: 8px;
-  border: 1px solid #e2e8f0;
-  text-align: center;
-}
-
-.expiration-stat .stat-label {
-  font-weight: 600;
-  color: #2d3748;
-  font-size: 0.9rem;
-  margin-bottom: 0.5rem;
-}
-
-.expiration-stat .stat-value {
-  font-size: 1.2rem;
-  font-weight: 700;
-  color: #3182ce;
-}
-
-.expiring-items-list {
-  background: white;
-  padding: 1rem;
-  border-radius: 8px;
-  border: 1px solid #e2e8f0;
-}
-
-.expiring-items-list h5 {
-  margin: 0 0 0.75rem 0;
-  color: #2d3748;
-  font-size: 1rem;
-  font-weight: 600;
-  border-bottom: 2px solid #3182ce;
-  padding-bottom: 0.25rem;
-}
-
-.expiring-items {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.alerts-report-content {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.alerts-summary {
-  display: flex;
-  justify-content: center;
-}
-
-.alert-stat {
-  background: white;
-  padding: 1rem;
-  border-radius: 8px;
-  border: 1px solid #e2e8f0;
-  text-align: center;
-  min-width: 150px;
-}
-
-.alert-stat .stat-label {
-  font-weight: 600;
-  color: #2d3748;
-  font-size: 0.9rem;
-  margin-bottom: 0.5rem;
-}
-
-.alert-stat .stat-value {
-  font-size: 1.2rem;
-  font-weight: 700;
-  color: #e53e3e;
-}
-
-.alerts-list {
-  background: white;
-  padding: 1rem;
-  border-radius: 8px;
-  border: 1px solid #e2e8f0;
-}
-
-.alerts-list h5 {
-  margin: 0 0 0.75rem 0;
-  color: #2d3748;
-  font-size: 1rem;
-  font-weight: 600;
-  border-bottom: 2px solid #3182ce;
-  padding-bottom: 0.25rem;
-}
-
-.alerts-items {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
+.btn-mini-edit { background: #f1f5f9; color: var(--text-grey); transition: all 0.2s; }
+.btn-mini-edit:hover { background: #e2e8f0; color: var(--text-dark); }
 </style>
-
-ñ
