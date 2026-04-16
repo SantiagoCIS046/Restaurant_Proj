@@ -104,6 +104,12 @@
           <div class="view-header">
             <h2>{{ selectedProductCategory }}</h2>
           </div>
+          <div class="items-header-row">
+            <span class="col-name">PRODUCTO</span>
+            <span class="col-qty">STOCK</span>
+            <span class="col-price">PRECIO</span>
+            <span class="col-actions">GESTIÓN</span>
+          </div>
           <div class="items-grid">
             <div
               v-for="(item, index) in products[selectedProductCategory]"
@@ -111,10 +117,22 @@
               class="item-card-modern"
             >
               <div class="item-card-inner">
-                <span class="item-name">{{ item.name }}</span>
-                <div class="item-actions">
-                  <button @click="editProduct(index)" class="btn-mini-edit"><i class="fas fa-edit"></i></button>
-                  <button @click="deleteProduct(index)" class="btn-mini-delete"><i class="fas fa-trash"></i></button>
+                <div class="col-name">
+                  <span class="item-name">{{ item.name }}</span>
+                </div>
+                <div class="col-qty">
+                  <span class="item-quantity-badge">{{ item.quantity }} uds</span>
+                </div>
+                <div class="col-price">
+                  <span class="item-price-badge">
+                    {{ item.price ? item.price.toLocaleString('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }) : '$0' }}
+                  </span>
+                </div>
+                <div class="col-actions">
+                  <div class="item-actions">
+                    <button @click="editProduct(index)" class="btn-mini-edit"><i class="fas fa-edit"></i></button>
+                    <button @click="deleteProduct(index)" class="btn-mini-delete"><i class="fas fa-trash"></i></button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -153,6 +171,11 @@
           <div class="view-header">
             <h2>{{ selectedIngredientCategory }}</h2>
           </div>
+          <div class="items-header-row">
+            <span class="col-name">INGREDIENTE</span>
+            <span class="col-qty">STOCK</span>
+            <span class="col-actions">GESTIÓN</span>
+          </div>
           <div class="items-grid">
             <div
               v-for="(item, index) in ingredients[selectedIngredientCategory]"
@@ -160,10 +183,17 @@
               class="item-card-modern"
             >
               <div class="item-card-inner">
-                <span class="item-name">{{ item.name }}</span>
-                <div class="item-actions">
-                  <button @click="editIngredient(index)" class="btn-mini-edit"><i class="fas fa-edit"></i></button>
-                  <button @click="deleteIngredient(index)" class="btn-mini-delete"><i class="fas fa-trash"></i></button>
+                <div class="col-name">
+                  <span class="item-name">{{ item.name }}</span>
+                </div>
+                <div class="col-qty">
+                  <span class="item-quantity-badge">{{ item.quantity }} uds</span>
+                </div>
+                <div class="col-actions">
+                  <div class="item-actions">
+                    <button @click="editIngredient(index)" class="btn-mini-edit"><i class="fas fa-edit"></i></button>
+                    <button @click="deleteIngredient(index)" class="btn-mini-delete"><i class="fas fa-trash"></i></button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -306,9 +336,14 @@
           type="number"
           placeholder="Cantidad"
         />
+        <input
+          v-model.number="newProduct.price"
+          type="number"
+          placeholder="Precio"
+        />
         <div class="modal-buttons">
-          <button @click="addProduct">Agregar</button>
-          <button @click="toggleAddProductForm">Cancelar</button>
+          <button class="btn-modal-primary" @click="addProduct">Agregar</button>
+          <button class="btn-modal-cancel" @click="toggleAddProductForm">Cancelar</button>
         </div>
       </div>
     </div>
@@ -327,9 +362,14 @@
           type="number"
           placeholder="Cantidad"
         />
+        <input
+          v-model.number="newProduct.price"
+          type="number"
+          placeholder="Precio"
+        />
         <div class="modal-buttons">
-          <button @click="updateProduct">Actualizar</button>
-          <button @click="showEditProductForm = false">Cancelar</button>
+          <button class="btn-modal-primary" @click="updateProduct">Actualizar</button>
+          <button class="btn-modal-cancel" @click="showEditProductForm = false">Cancelar</button>
         </div>
       </div>
     </div>
@@ -362,8 +402,8 @@
           placeholder="Cantidad"
         />
         <div class="modal-buttons">
-          <button @click="addIngredient">Agregar</button>
-          <button @click="toggleAddIngredientForm">Cancelar</button>
+          <button class="btn-modal-primary" @click="addIngredient">Agregar</button>
+          <button class="btn-modal-cancel" @click="toggleAddIngredientForm">Cancelar</button>
         </div>
       </div>
     </div>
@@ -386,8 +426,8 @@
           placeholder="Cantidad"
         />
         <div class="modal-buttons">
-          <button @click="updateIngredient">Actualizar</button>
-          <button @click="showEditIngredientForm = false">Cancelar</button>
+          <button class="btn-modal-primary" @click="updateIngredient">Actualizar</button>
+          <button class="btn-modal-cancel" @click="showEditIngredientForm = false">Cancelar</button>
         </div>
       </div>
     </div>
@@ -405,8 +445,8 @@
           placeholder="Nombre de la categoría"
         />
         <div class="modal-buttons">
-          <button @click="addCategory">Agregar</button>
-          <button @click="showAddCategoryForm = false">Cancelar</button>
+          <button class="btn-modal-primary" @click="addCategory">Agregar</button>
+          <button class="btn-modal-cancel" @click="showAddCategoryForm = false">Cancelar</button>
         </div>
       </div>
     </div>
@@ -433,10 +473,10 @@
           </option>
         </select>
         <div class="modal-buttons">
-          <button @click="deleteCategory(deleteType, selectedCategoryToDelete)">
+          <button class="btn-modal-danger" @click="deleteCategory(deleteType, selectedCategoryToDelete)">
             Eliminar
           </button>
-          <button @click="showDeleteCategoryForm = false">Cancelar</button>
+          <button class="btn-modal-cancel" @click="showDeleteCategoryForm = false">Cancelar</button>
         </div>
       </div>
     </div>
@@ -1802,27 +1842,27 @@ const productCategories = ref([
 ]);
 const products = ref({
   Bebidas: [
-    { name: "Coca Cola", quantity: 10 },
-    { name: "Sprite", quantity: 5 },
+    { name: "Coca Cola", quantity: 10, price: 3500 },
+    { name: "Sprite", quantity: 5, price: 3200 },
   ],
   Entradas: [
-    { name: "Empanadas", quantity: 20 },
-    { name: "Patacones", quantity: 15 },
+    { name: "Empanadas", quantity: 20, price: 4500 },
+    { name: "Patacones", quantity: 15, price: 6000 },
   ],
   Adicionales: [
-    { name: "Arroz", quantity: 30 },
-    { name: "Frijoles", quantity: 25 },
+    { name: "Arroz", quantity: 30, price: 2500 },
+    { name: "Frijoles", quantity: 25, price: 3000 },
   ],
-  "Comida de Mar": [{ name: "Ceviche de Camarón", quantity: 10 }],
-  "Nuestros Pescados": [{ name: "Mojarra Frita", quantity: 8 }],
-  "Cocina Tipica": [{ name: "Bandeja Paisa", quantity: 5 }],
-  Res: [{ name: "Churrasco", quantity: 12 }],
-  Cerdo: [{ name: "Lechona", quantity: 6 }],
-  Pastas: [{ name: "Spaghetti Carbonara", quantity: 10 }],
-  Aves: [{ name: "Pollo con Papas", quantity: 15 }],
-  Vegetales: [{ name: "Ensalada Mixta", quantity: 20 }],
-  Postres: [{ name: "Tres Leches", quantity: 10 }],
-  Ensaladas: [{ name: "Ensalada César", quantity: 12 }],
+  "Comida de Mar": [{ name: "Ceviche de Camarón", quantity: 10, price: 25000 }],
+  "Nuestros Pescados": [{ name: "Mojarra Frita", quantity: 8, price: 32000 }],
+  "Cocina Tipica": [{ name: "Bandeja Paisa", quantity: 5, price: 35000 }],
+  Res: [{ name: "Churrasco", quantity: 12, price: 42000 }],
+  Cerdo: [{ name: "Lechona", quantity: 6, price: 18000 }],
+  Pastas: [{ name: "Spaghetti Carbonara", quantity: 10, price: 28000 }],
+  Aves: [{ name: "Pollo con Papas", quantity: 15, price: 24000 }],
+  Vegetales: [{ name: "Ensalada Mixta", quantity: 20, price: 12000 }],
+  Postres: [{ name: "Tres Leches", quantity: 10, price: 9500 }],
+  Ensaladas: [{ name: "Ensalada César", quantity: 12, price: 18000 }],
 });
 const ingredientCategories = ref([
   "Verduras",
@@ -1858,7 +1898,7 @@ const showEditProductForm = ref(false);
 const showEditIngredientForm = ref(false);
 const showAddCategoryForm = ref(false);
 const showDeleteCategoryForm = ref(false);
-const newProduct = ref({ category: "", name: "", quantity: 0 });
+const newProduct = ref({ category: "", name: "", quantity: 0, price: 0 });
 const newIngredient = ref({ category: "", name: "", quantity: 0 });
 const newCategory = ref({ name: "", type: "" });
 const editingProductIndex = ref(-1);
@@ -1993,17 +2033,32 @@ const toggleAddIngredientForm = () => {
 
 const addProduct = () => {
   if (newProduct.value.category && newProduct.value.name) {
+    const exists = products.value[newProduct.value.category].some(
+      (p) => p.name.toLowerCase() === newProduct.value.name.toLowerCase()
+    );
+    if (exists) {
+      alert(`El producto "${newProduct.value.name}" ya existe en esta categoría.`);
+      return;
+    }
     products.value[newProduct.value.category].push({
       name: newProduct.value.name,
       quantity: newProduct.value.quantity,
+      price: newProduct.value.price,
     });
-    newProduct.value = { category: "", name: "", quantity: 0 };
+    newProduct.value = { category: "", name: "", quantity: 0, price: 0 };
     showAddProductForm.value = false;
   }
 };
 
 const addIngredient = () => {
   if (newIngredient.value.category && newIngredient.value.name) {
+    const exists = ingredients.value[newIngredient.value.category].some(
+      (i) => i.name.toLowerCase() === newIngredient.value.name.toLowerCase()
+    );
+    if (exists) {
+      alert(`El ingrediente "${newIngredient.value.name}" ya existe en esta categoría.`);
+      return;
+    }
     ingredients.value[newIngredient.value.category].push({
       name: newIngredient.value.name,
       quantity: newIngredient.value.quantity,
@@ -2032,6 +2087,7 @@ const updateProduct = () => {
     products.value[selectedProductCategory.value][editingProductIndex.value] = {
       name: newProduct.value.name,
       quantity: newProduct.value.quantity,
+      price: newProduct.value.price,
     };
     showEditProductForm.value = false;
     editingProductIndex.value = -1;
@@ -2072,12 +2128,24 @@ const toggleDeleteCategoryForm = (type) => {
 
 const addCategory = () => {
   if (newCategory.value.name && newCategory.value.type) {
-    if (newCategory.value.type === "productos") {
-      productCategories.value.push(newCategory.value.name);
-      products.value[newCategory.value.name] = [];
-    } else if (newCategory.value.type === "ingredientes") {
-      ingredientCategories.value.push(newCategory.value.name);
-      ingredients.value[newCategory.value.name] = [];
+    const catName = newCategory.value.name.trim();
+    const type = newCategory.value.type;
+    
+    const exists = type === "productos" 
+      ? productCategories.value.some(c => c.toLowerCase() === catName.toLowerCase())
+      : ingredientCategories.value.some(c => c.toLowerCase() === catName.toLowerCase());
+
+    if (exists) {
+      alert(`La categoría "${catName}" ya existe.`);
+      return;
+    }
+
+    if (type === "productos") {
+      productCategories.value.push(catName);
+      products.value[catName] = [];
+    } else if (type === "ingredientes") {
+      ingredientCategories.value.push(catName);
+      ingredients.value[catName] = [];
     }
     newCategory.value = { name: "", type: "" };
     showAddCategoryForm.value = false;
@@ -3195,9 +3263,9 @@ const exportReport = () => {
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
 
 :root {
-  --primary-emerald: #56cf44;
-  --primary-blue: #0061f2;
-  --primary-red: #e53e3e;
+  --primary-emerald: #10b981;
+  --primary-blue: #3b82f6;
+  --primary-red: #ef4444;
   --bg-light: #f8fafc;
   --text-dark: #1e293b;
   --text-grey: #64748b;
@@ -3278,25 +3346,42 @@ const exportReport = () => {
 .btn-action-green, .btn-action-red, .btn-action-blue {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 10px 20px;
-  border-radius: 12px;
+  gap: 10px;
+  padding: 12px 24px;
+  border-radius: 14px;
   border: none;
   color: white;
-  font-weight: 700;
-  font-size: 0.95rem;
+  font-weight: 800;
+  font-size: 0.9rem;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  letter-spacing: 0.3px;
 }
 
-.btn-action-green { background: var(--primary-emerald); }
-.btn-action-red { background: var(--primary-red); }
-.btn-action-blue { background: var(--primary-blue); }
+.btn-action-green { 
+  background: linear-gradient(135deg, #10b981, #059669); 
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+}
+
+.btn-action-red { 
+  background: linear-gradient(135deg, #ef4444, #dc2626); 
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+}
+
+.btn-action-blue { 
+  background: linear-gradient(135deg, #3b82f6, #2563eb); 
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+}
 
 .btn-action-green:hover, .btn-action-red:hover, .btn-action-blue:hover {
-  transform: translateY(-2px);
-  filter: brightness(1.1);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-3px);
+  filter: brightness(1.05);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.15);
+}
+
+.btn-action-green:active, .btn-action-red:active, .btn-action-blue:active {
+  transform: translateY(-1px);
 }
 
 /* --- Main Layout --- */
@@ -3326,28 +3411,35 @@ const exportReport = () => {
 
 .sidebar-nav-item {
   width: 100%;
-  padding: 16px 20px;
-  background: var(--white);
+  padding: 14px 18px;
+  background: #e2e8f0;
   border: 1px solid var(--border-light);
-  border-radius: 12px;
+  border-radius: 14px;
   text-align: left;
   font-weight: 700;
-  color: var(--text-dark);
+  color: #475569;
   cursor: pointer;
-  transition: all 0.2s;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  margin-bottom: 2px;
 }
 
 .sidebar-nav-item:hover {
-  border-color: var(--primary-blue);
-  transform: translateX(4px);
+  background: #cbd5e1;
+  color: var(--text-dark);
+  border-color: #cbd5e1;
+  transform: translateX(6px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 .sidebar-nav-item.active {
-  border-color: var(--primary-blue);
-  background: #f0f7ff;
-  color: var(--primary-blue);
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: white;
+  border-color: transparent;
+  box-shadow: 0 8px 16px rgba(59, 130, 246, 0.3);
+  transform: translateX(8px);
 }
+
 
 /* --- View Area --- */
 .inventory-view-area {
@@ -3391,17 +3483,29 @@ const exportReport = () => {
 }
 
 .items-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
 }
 
 .item-card-modern {
-  background: var(--white);
-  border: 1px solid var(--border-light);
-  border-radius: 16px;
-  padding: 20px;
-  transition: all 0.2s;
+  background: white;
+  border-bottom: 1px solid var(--border-light);
+  padding: 10px 0;
+  transition: all 0.2s ease;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.item-card-modern:last-child {
+  border-bottom: none;
+}
+
+.item-card-modern:hover {
+  background: #f8fafc;
+  border-color: var(--primary-blue);
+  box-shadow: inset 0 0 0 1px var(--primary-blue);
 }
 
 .item-card-inner {
@@ -3433,6 +3537,92 @@ const exportReport = () => {
 
 .btn-mini-edit { background: #f1f5f9; color: var(--text-grey); }
 .btn-mini-delete { background: #fef2f2; color: var(--primary-red); }
+
+/* --- New Inventory List Styles --- */
+.items-header-row {
+  display: flex;
+  background: #e2e8f0;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px 8px 0 0;
+  font-weight: 800;
+  font-size: 0.7rem;
+  color: #334155;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.items-grid {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  border: 1px solid #cbd5e1;
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  overflow: hidden;
+  background: white;
+}
+
+.col-name { 
+  flex: 1; 
+  padding: 12px 24px;
+  display: flex; 
+  align-items: center; 
+  border-right: 1px solid #cbd5e1;
+}
+
+.col-qty { 
+  width: 120px; 
+  padding: 12px;
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  border-right: 1px solid #cbd5e1;
+  background: #f1f5f9;
+}
+
+.col-price {
+  width: 140px;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-right: 1px solid #cbd5e1;
+}
+
+.col-actions { 
+  width: 120px; 
+  padding: 12px 24px;
+  display: flex; 
+  align-items: center; 
+  justify-content: flex-end; 
+}
+
+.item-price-badge {
+  color: #166534;
+  font-weight: 800;
+  font-size: 0.95rem;
+  font-family: 'Outfit', sans-serif;
+}
+
+.item-card-modern:nth-child(even) {
+  background-color: #f8fafc;
+}
+
+.item-quantity-badge {
+  background: #e0f2fe;
+  color: #0369a1;
+  padding: 6px 14px;
+  border-radius: 10px;
+  font-weight: 800;
+  font-size: 0.85rem;
+  border: 1px solid #bae6fd;
+}
+
+.item-card-inner {
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
 
 .animate-fade-in { animation: fadeIn 0.4s ease-out; }
 @keyframes fadeIn {
@@ -3519,90 +3709,120 @@ const exportReport = () => {
   margin-top: 4px;
 }
 
-/* --- Modal Improvements --- */
+/* --- Modal Overhaul --- */
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(15, 23, 42, 0.6);
-  backdrop-filter: blur(8px);
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(12px);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 2000;
-  padding: 20px;
+  z-index: 3000;
+  padding: 24px;
 }
 
 .modal-content, .report-modal-content, .alerts-modal-content {
   background: var(--white);
   padding: 40px;
-  border-radius: 28px;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-  border: 1px solid var(--border-light);
-  max-width: 550px;
+  border-radius: 32px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  max-width: 500px;
   width: 100%;
   animation: modalScaleUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
   position: relative;
 }
 
 @keyframes modalScaleUp {
-  from { opacity: 0; transform: scale(0.9) translateY(20px); }
+  from { opacity: 0; transform: scale(0.9) translateY(40px); }
   to { opacity: 1; transform: scale(1) translateY(0); }
 }
 
-.modal-content h3, .report-modal-content h3, .alerts-modal-content h3 {
-  font-size: 1.75rem;
+.modal-content h3 {
+  font-size: 2rem;
   font-weight: 800;
   color: var(--text-dark);
-  margin-bottom: 24px;
-  letter-spacing: -0.02em;
+  margin-bottom: 30px;
+  letter-spacing: -0.03em;
+  text-align: center;
 }
 
 .modal-content input, .modal-content select {
   width: 100%;
-  padding: 16px 20px;
-  border-radius: 14px;
-  border: 1px solid var(--border-light);
+  padding: 18px 24px;
+  border-radius: 16px;
+  border: 2px solid #f1f5f9;
   background: #f8fafc;
-  font-family: inherit;
+  font-family: 'Outfit', sans-serif;
   font-size: 1rem;
-  margin-bottom: 20px;
-  transition: all 0.2s;
+  font-weight: 500;
+  margin-bottom: 24px;
+  transition: all 0.3s ease;
   box-sizing: border-box;
+  color: var(--text-dark);
 }
 
 .modal-content input:focus, .modal-content select:focus {
   outline: none;
   border-color: var(--primary-blue);
   background: white;
-  box-shadow: 0 0 0 4px rgba(0, 97, 242, 0.1);
+  box-shadow: 0 0 0 5px rgba(59, 130, 246, 0.15);
+  transform: translateY(-2px);
 }
 
 .modal-buttons {
   display: flex;
   gap: 16px;
-  margin-top: 24px;
+  margin-top: 32px;
 }
 
-.modal-buttons button {
+.btn-modal-primary, .btn-modal-danger, .btn-modal-cancel {
   flex: 1;
-  padding: 16px;
-  border-radius: 14px;
-  font-weight: 700;
+  padding: 18px;
+  border-radius: 18px;
+  font-weight: 800;
   font-size: 1rem;
   cursor: pointer;
-  transition: all 0.2s;
-}
-
-.modal-buttons button:first-child {
-  background: var(--primary-blue);
-  color: white;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  letter-spacing: 0.5px;
 }
 
-.modal-buttons button:last-child {
+.btn-modal-primary {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: white;
+  box-shadow: 0 10px 20px -5px rgba(59, 130, 246, 0.4);
+}
+
+.btn-modal-danger {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: white;
+  box-shadow: 0 10px 20px -5px rgba(239, 68, 68, 0.4);
+}
+
+.btn-modal-cancel {
   background: #f1f5f9;
-  color: var(--text-grey);
-  border: 1px solid var(--border-light);
+  color: #64748b;
+  border: 1px solid #e2e8f0;
+}
+
+.btn-modal-primary:hover, .btn-modal-danger:hover {
+  transform: translateY(-4px);
+  filter: brightness(1.1);
+  box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.2);
+}
+
+.btn-modal-cancel:hover {
+  background: #e2e8f0;
+  color: var(--text-dark);
+}
+
+.btn-modal-primary:active, .btn-modal-danger:active, .btn-modal-cancel:active {
+  transform: translateY(-1px);
 }
 
 /* --- Alerts Modal Specifics --- */

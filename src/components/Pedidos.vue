@@ -936,9 +936,26 @@ onMounted(() => {
   transition: all 0.2s;
 }
 
+.view-toggle-btn.secondary {
+  background: #f1f5f9;
+  color: #1e293b;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.view-toggle-btn.secondary i {
+  color: var(--accent-color);
+}
+
 .view-toggle-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 15px rgba(16, 185, 129, 0.4);
+}
+
+.view-toggle-btn.secondary:hover {
+  background: #e2e8f0;
+  border-color: var(--accent-color);
+  color: var(--accent-color);
 }
 
 /* --- Main Content --- */

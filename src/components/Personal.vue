@@ -74,34 +74,63 @@
             <div class="stat-label">Socios</div>
           </div>
         </div>
+        <div class="personal-header-row">
+          <span class="col-name">NOMBRE</span>
+          <span class="col-rol">ROL</span>
+          <span class="col-turno">TURNO</span>
+          <span class="col-propina">PROPINA</span>
+          <span class="col-salario">SALARIO</span>
+          <span class="col-actions">GESTIÓN</span>
+        </div>
         <div class="personal-list">
           <div
             v-for="persona in filteredPersonal"
             :key="persona.id"
             class="personal-card"
           >
-            <div class="personal-info">
+            <div class="col-name">
               <h3>{{ persona.nombre }}</h3>
-              <p>Rol: {{ persona.rol }}</p>
-              <p>Turno: {{ persona.turno }}</p>
-              <p>Salario: ${{ persona.salario || "No especificado" }}</p>
-              <p v-if="persona.propinaAutomatica">
-                Propina Automática: Sí ({{ persona.mesasAtendidas }} mesas)
-              </p>
-              <p v-else>Propina Automática: No</p>
-              <p v-if="persona.propinaAutomatica">
-                Propina Diaria: ${{
-                  calcularPropinaAutomatica(persona, 800000)
-                }}
-              </p>
             </div>
-            <div class="personal-actions">
-              <button class="edit-btn" @click="editarPersonal(persona)">
-                ✏️ Editar
-              </button>
-              <button class="delete-btn" @click="eliminarPersonal(persona.id)">
-                🗑️ Eliminar
-              </button>
+            <div class="col-rol">
+              <span class="rol-badge">{{ persona.rol }}</span>
+            </div>
+            <div class="col-turno">
+              <span>{{ persona.turno }}</span>
+            </div>
+            <div class="col-propina">
+              <span class="propina-badge" :class="{ 'has-propina': persona.propinaAutomatica }">
+                {{ persona.propinaAutomatica ? '$' + calcularPropinaAutomatica(persona, 800000).toLocaleString() : '$0' }}
+              </span>
+            </div>
+            <div class="col-salario">
+              <span>${{ persona.salario || "---" }}</span>
+            </div>
+            <div class="col-actions">
+              <div class="personal-actions">
+                <button class="edit-btn" @click="editarPersonal(persona)">
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button class="delete-btn" @click="eliminarPersonal(persona.id)">
+                  <i class="fas fa-trash-alt"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="personal-legend-container">
+          <p class="legend-title"><i class="fas fa-info-circle"></i> Guía de Cálculo de Propinas</p>
+          <div class="legend-content">
+            <div class="legend-item">
+              <span class="legend-bullet">•</span>
+              <span>Se activa si las ventas diarias superan los <strong>$600,000 COP</strong>.</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-bullet">•</span>
+              <span><strong>Meseros:</strong> $5,000 COP por cada mesa atendida.</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-bullet">•</span>
+              <span><strong>Otros Roles:</strong> $10,000 COP fijos si tienen propina automática activa.</span>
             </div>
           </div>
         </div>
@@ -164,9 +193,9 @@
             />
           </div>
           <div class="form-group">
-            <label>
+            <label class="checkbox-container">
               <input type="checkbox" v-model="newPersonal.propinaAutomatica" />
-              Propina Automática
+              <span class="checkbox-label">Propina Automática</span>
             </label>
           </div>
           <div v-if="newPersonal.propinaAutomatica" class="form-group">
@@ -176,6 +205,7 @@
               id="personal-mesas"
               v-model="newPersonal.mesasAtendidas"
               min="0"
+              placeholder="Ej: 15"
             />
           </div>
           <div class="form-actions">
@@ -410,25 +440,25 @@ onMounted(() => {
 .mostrador-layout {
   display: flex;
   gap: 2rem;
-  height: calc(100vh - 200px);
+  height: calc(100vh - 140px);
+  margin-top: 1rem;
 }
 
 .sidebar {
-  width: 300px;
-  background: #f8f9fa;
-  padding: 1rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  width: 280px;
+  background: white;
+  padding: 1.25rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
 }
 
 .search-bar {
-  display: flex;
-  margin-bottom: 1rem;
-  background: white;
-  padding: 0.5rem;
-  border-radius: 8px;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  width: 100%;
 }
 
 .search-input {
@@ -446,85 +476,204 @@ onMounted(() => {
 }
 
 .personal-btn {
-  padding: 0.75rem;
-  background: #3182ce;
-  color: white;
-  border: none;
-  border-radius: 6px;
+  padding: 0.6rem 0.85rem;
+  background: #f1f5f9;
+  color: #475569;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
   cursor: pointer;
-  font-size: 1rem;
-  transition: background 0.2s ease;
+  font-size: 0.85rem;
+  font-weight: 700;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  text-align: left;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .personal-btn:hover {
-  background: #2c5282;
+  background: #e2e8f0;
+  color: #1e293b;
+  padding-left: 1rem;
+}
+
+.personal-btn.active {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: white;
+  border-color: #2563eb;
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.15);
+  padding-left: 1rem;
 }
 
 .main-content {
   flex: 1;
   background: white;
-  padding: 1rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   overflow-y: auto;
+  border: 1px solid #e2e8f0;
 }
 
 .personal-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 1rem;
-  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  border: 1px solid #cbd5e1;
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  overflow: hidden;
 }
 
 .personal-card {
-  background: #f8f9fa;
-  padding: 1rem;
-  border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  background: white;
+  border-bottom: 1px solid #cbd5e1;
+  display: flex;
+  align-items: center;
+  transition: all 0.2s ease;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.personal-card:last-child {
+  border-bottom: none;
+}
+
+.personal-card:nth-child(even) {
+  background-color: #f8fafc;
+}
+
+.personal-card:hover {
+  background: #f1f5f9;
+  box-shadow: inset 0 0 0 1px #3182ce;
 }
 
 .personal-info h3 {
-  margin: 0 0 0.5rem 0;
+  margin: 0;
   color: #2d3748;
+  font-size: 1rem;
 }
 
 .personal-info p {
-  margin: 0.25rem 0;
+  margin: 0;
   color: #4a5568;
+  font-size: 0.85rem;
+}
+
+.personal-header-row {
+  display: flex;
+  background: #e2e8f0;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px 8px 0 0;
+  font-weight: 800;
+  font-size: 0.7rem;
+  color: #334155;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 1rem;
+}
+
+.col-name { 
+  flex: 1; 
+  padding: 10px 20px;
+  display: flex; 
+  align-items: center; 
+  border-right: 1px solid #cbd5e1;
+  min-width: 0;
+}
+
+.col-name h3 {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #1e293b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.col-rol, .col-turno, .col-propina, .col-salario {
+  flex: 0 0 110px;
+  padding: 10px 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-right: 1px solid #cbd5e1;
+  font-size: 0.85rem;
+  color: #475569;
+}
+
+.propina-badge {
+  font-weight: 800;
+  color: #94a3b8;
+}
+
+.propina-badge.has-propina {
+  color: #059669;
+}
+
+.col-rol {
+  background: #f8fafc;
+}
+
+.col-actions { 
+  flex: 0 0 100px;
+  padding: 10px;
+  display: flex; 
+  align-items: center; 
+  justify-content: center;
 }
 
 .personal-actions {
   display: flex;
-  gap: 0.5rem;
-  margin-top: 1rem;
+  flex-direction: row;
+  gap: 8px;
+  justify-content: center;
+  align-items: center;
+}
+
+.rol-badge {
+  background: #e0f2fe;
+  color: #0369a1;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 0.8rem;
+  text-transform: capitalize;
 }
 
 .edit-btn,
 .delete-btn {
-  padding: 0.5rem 0.75rem;
+  width: 30px;
+  height: 30px;
   border: none;
-  border-radius: 4px;
+  border-radius: 6px;
   cursor: pointer;
-  font-size: 0.9rem;
-  transition: background 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  transition: all 0.2s ease;
 }
 
 .edit-btn {
-  background: #38a169;
-  color: white;
+  background: #f0fdf4;
+  color: #166534;
 }
 
 .edit-btn:hover {
-  background: #2f855a;
+  background: #dcfce7;
+  transform: scale(1.1);
 }
 
 .delete-btn {
-  background: #e53e3e;
-  color: white;
+  background: #fef2f2;
+  color: #991b1b;
 }
 
 .delete-btn:hover {
-  background: #c53030;
+  background: #fee2e2;
+  transform: scale(1.1);
 }
 
 .header-container {
@@ -558,24 +707,27 @@ onMounted(() => {
 
 .stat-item {
   background: #f8f9fa;
-  padding: 1rem;
-  border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   text-align: center;
-  min-width: 120px;
+  min-width: 100px;
+  border: 1px solid #f1f5f9;
 }
 
 .stat-number {
-  font-size: 2rem;
-  font-weight: bold;
+  font-size: 1.5rem;
+  font-weight: 800;
   color: #3182ce;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.25rem;
 }
 
 .stat-label {
-  font-size: 0.9rem;
-  color: #4a5568;
-  text-transform: capitalize;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .modal {
@@ -663,5 +815,74 @@ onMounted(() => {
 
 .form-actions button:hover:last-child {
   background: #2c5282;
+}
+.form-help-text {
+  font-size: 0.8rem;
+  color: #64748b;
+  margin-top: 0.5rem;
+  line-height: 1.6;
+  background: #f8fafc;
+  padding: 0.75rem;
+  border-radius: 8px;
+  border-left: 4px solid #3b82f6;
+}
+
+.form-help-text strong {
+  color: #1e293b;
+}
+
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  padding: 0.25rem 0;
+}
+
+.checkbox-label {
+  font-weight: 700;
+  color: #1e293b;
+  font-size: 0.95rem;
+}
+/* Personal Legend */
+.personal-legend-container {
+  margin-top: 1rem;
+  padding: 0.75rem 1rem;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.legend-title {
+  margin: 0 0 0.5rem 0;
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #475569;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.legend-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.legend-item {
+  font-size: 0.75rem;
+  color: #64748b;
+  display: flex;
+  gap: 0.4rem;
+  align-items: flex-start;
+}
+
+.legend-bullet {
+  color: #3b82f6;
+  font-weight: 900;
 }
 </style>
